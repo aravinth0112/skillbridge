@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – SkillBridge</title>
+  <link rel="stylesheet" href="/app/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/app/favicon.svg">
+  <script src="/app/js/vendor/chart.umd.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Left Navigation Rail -->
+    <div id="rail-container"></div>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <header class="view-header">
+        <h1 class="view-title">Who fits your next project?</h1>
+      </header>
+
+      <!-- 1. Hero "Ask SkillBridge" Search Bar -->
+      <section class="hero-ask-container" aria-label="Smart search assistant">
+        <form id="ask-form" onsubmit="handleAskSkillBridge(event)" class="hero-ask-form" novalidate>
+          <div style="flex: 1; position: relative;">
+            <input
+              type="text"
+              id="ask-input"
+              class="hero-ask-input"
+              style="width: 100%;"
+              placeholder="Ask anything: for example, 3rd year students with Python and Docker"
+            >
+          </div>
+          <button type="submit" id="btn-ask-submit" class="btn btn-primary" style="padding: 0.85rem 1.6rem; font-size: 1rem;">
+            Ask
+          </button>
+        </form>
+
+        <div id="ask-input-error" class="field-error" style="display: none;"></div>
+
+        <!-- 3 Clickable Example Queries -->
+        <div class="prompt-chips">
+          <button type="button" class="prompt-chip" onclick="applySampleQuery('Python and PyTorch available')">
+            Python and PyTorch available
+          </button>
+          <button type="button" class="prompt-chip" onclick="applySampleQuery('Frontend UI and UX design')">
+            Frontend UI and UX design
+          </button>
+          <button type="button" class="prompt-chip" onclick="applySampleQuery('3rd year Robotics')">
+            3rd year Robotics
+          </button>
+        </div>
+
+        <!-- Inline Results Container -->
+        <div id="ask-results-container" style="display: none; margin-top: 1.25rem; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+          <div id="ask-interpreted-filters" style="font-size: 0.88rem; color: var(--ink-muted); margin-bottom: 0.85rem;"></div>
+          <div id="ask-results-list" style="display: flex; flex-direction: column; gap: 0.65rem;"></div>
+          <div id="ask-see-all-container" style="margin-top: 1rem; text-align: right;"></div>
+        </div>
+      </section>
+
+      <!-- 2. Compact 6 Totals Single Line -->
+      <div class="metrics-strip" aria-label="Summary totals">
+        <div class="metric-item">
+          <strong id="total-students" class="num-tabular">0</strong>
+          <span>students</span>
+        </div>
+        <span class="metric-sep">/</span>
+        <div class="metric-item">
+          <strong id="total-departments" class="num-tabular">0</strong>
+          <span>departments</span>
+        </div>
+        <span class="metric-sep">/</span>
+        <div class="metric-item">
+          <strong id="total-courses" class="num-tabular">0</strong>
+          <span>courses</span>
+        </div>
+        <span class="metric-sep">/</span>
+        <div class="metric-item">
+          <strong id="total-skills" class="num-tabular">0</strong>
+          <span>skills</span>
+        </div>
+        <span class="metric-sep">/</span>
+        <div class="metric-item">
+          <strong id="total-projects" class="num-tabular">0</strong>
+          <span>projects</span>
+        </div>
+        <span class="metric-sep">/</span>
+        <div class="metric-item">
+          <strong id="total-shortlists" class="num-tabular">0</strong>
+          <span>shortlists</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.75rem; align-items: start;">
+        <!-- 3. Diverging Supply & Demand Chart (One Shared Scale) -->
+        <section class="panel" aria-label="Skill supply and demand">
+          <div class="panel-header" style="margin-bottom: 0.5rem; border-bottom: none; padding-bottom: 0;">
+            <h2 class="panel-title">Skill supply and demand</h2>
+          </div>
+          <p class="form-hint" style="margin-bottom: 1.25rem;">Skills projects ask for, against students who have them.</p>
+
+          <div class="supply-demand-table">
+            <div class="sd-header-row">
+              <span style="text-align: right;">Student supply</span>
+              <span style="text-align: center;">Skill</span>
+              <span style="text-align: left;">Project demand</span>
+            </div>
+            <div id="sd-rows-container">
+              <!-- Skeleton Loading -->
+              <div class="skeleton-row"><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 20%;"></div><div class="skeleton-bar" style="width: 25%;"></div></div>
+              <div class="skeleton-row"><div class="skeleton-bar" style="width: 45%;"></div><div class="skeleton-bar" style="width: 15%;"></div><div class="skeleton-bar" style="width: 10%;"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Students Per Department Ranked List -->
+        <section class="panel" aria-label="Students by department">
+          <div class="panel-header">
+            <h2 class="panel-title">Students by department</h2>
+          </div>
+
+          <div id="dept-ranked-container" class="dept-ranked-list">
+            <div class="skeleton-row"><div class="skeleton-bar" style="width: 60%;"></div><div class="skeleton-bar" style="width: 20%;"></div></div>
+            <div class="skeleton-row"><div class="skeleton-bar" style="width: 40%;"></div><div class="skeleton-bar" style="width: 20%;"></div></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="/app/js/common.js"></script>
+  <script src="/app/js/dashboard.js"></script>
+</body>
+</html>

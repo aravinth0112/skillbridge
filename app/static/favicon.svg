@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Five Rising Bars (Skill Gauge) -->
+  <rect x="4" y="20" width="3" height="6" rx="1" fill="#1D4ED8" opacity="0.6"/>
+  <rect x="9.5" y="16" width="3" height="10" rx="1" fill="#1D4ED8" opacity="0.75"/>
+  <rect x="15" y="12" width="3" height="14" rx="1" fill="#1D4ED8" opacity="0.9"/>
+  <rect x="20.5" y="8" width="3" height="18" rx="1" fill="#1D4ED8"/>
+  <rect x="26" y="4" width="3" height="22" rx="1" fill="#1D4ED8"/>
+  <!-- Connecting Arch (Bridge) -->
+  <path d="M 3 24 Q 16 1 29 24" stroke="#0D1527" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+</svg>

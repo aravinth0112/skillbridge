@@ -1,0 +1,36 @@
+# SkillBridge Git Ignore
+
+# Local SQLite databases
+skillbridge.db
+*.db
+*.db-journal
+test_skillbridge.db
+
+# Environment variables & secrets
+.env
+.env.local
+
+# Python caches & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+.venv/
+env/
+
+# Node dependencies
+node_modules/
+
+# Temporary test screenshots
+edge_shots/
+edge_temp/
+
+# Root level images only (allow docs/screenshots)
+/*.png
+
+# IDE files
+.vscode/
+.idea/

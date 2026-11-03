@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Students – SkillBridge</title>
+  <link rel="icon" type="image/svg+xml" href="/app/favicon.svg">
+  <link rel="stylesheet" href="/app/css/style.css">
+  <style>
+    .students-layout {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 1.75rem;
+      align-items: start;
+    }
+    .filter-panel {
+      position: sticky;
+      top: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+    }
+    .roster-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .roster-row-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: border-color 0.15s ease;
+    }
+    .roster-row-container:hover {
+      border-color: var(--ink-navy);
+    }
+    .roster-row {
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      cursor: pointer;
+    }
+    .roster-primary {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 200px;
+    }
+    .roster-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.75rem;
+      flex: 1;
+      align-items: center;
+    }
+    .compact-skill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--paper);
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+      cursor: default;
+    }
+    .compact-skill-name {
+      font-weight: 600;
+      color: var(--ink-navy);
+    }
+    .roster-expanded-details {
+      background: #F8FAFC;
+    }
+    .expanded-skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.75rem 1.25rem;
+      margin-top: 0.75rem;
+    }
+    @media (max-width: 900px) {
+      .students-layout {
+        grid-template-columns: 1fr;
+      }
+      .filter-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Left Navigation Rail -->
+    <div id="rail-container"></div>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <header class="view-header">
+        <h1 class="view-title">Find students</h1>
+        <div>
+          <button type="button" class="btn btn-primary" onclick="openAddStudentDrawer()">Add student</button>
+        </div>
+      </header>
+
+      <div id="students-notice-area"></div>
+
+      <!-- Layout: Sticky Filters Left + Roster Right -->
+      <div class="students-layout">
+        <!-- Sticky Filter Panel -->
+        <aside class="filter-panel" aria-label="Search and filtering panel">
+          <div class="panel-header" style="margin-bottom: 1rem; padding-bottom: 0.5rem;">
+            <h2 class="panel-title" style="font-size: 1.05rem;">Filters</h2>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilters()">Reset</button>
+          </div>
+
+          <form id="filter-form" onsubmit="handleFilterSubmit(event)" novalidate>
+            <!-- 1. Searchable Skill Picker -->
+            <div class="form-group">
+              <label for="skill-search-input" class="form-label">Skills</label>
+              <div id="selected-skills-chips" class="skill-chips-container"></div>
+              <div class="skill-picker">
+                <input
+                  type="text"
+                  id="skill-search-input"
+                  class="form-input"
+                  placeholder="Type skill to add..."
+                  autocomplete="off"
+                >
+                <div id="skill-dropdown" class="skill-dropdown" role="listbox"></div>
+              </div>
+            </div>
+
+            <!-- 2. Skill Match Mode (Segmented Toggle) -->
+            <div class="form-group">
+              <label class="form-label">Skill match logic</label>
+              <div class="segmented-control" role="group" aria-label="Skill match mode">
+                <button type="button" id="mode-or" class="segmented-btn active" onclick="setSkillMode('OR')">Any skill (OR)</button>
+                <button type="button" id="mode-and" class="segmented-btn" onclick="setSkillMode('AND')">All skills (AND)</button>
+              </div>
+            </div>
+
+            <!-- 3. Cohort Year (4-Button Segmented Control) -->
+            <div class="form-group">
+              <label class="form-label">Cohort year</label>
+              <div class="segmented-control" role="group" aria-label="Cohort year">
+                <button type="button" class="segmented-btn year-btn active" data-year="" onclick="setYearFilter('')">All</button>
+                <button type="button" class="segmented-btn year-btn" data-year="1" onclick="setYearFilter('1')">1</button>
+                <button type="button" class="segmented-btn year-btn" data-year="2" onclick="setYearFilter('2')">2</button>
+                <button type="button" class="segmented-btn year-btn" data-year="3" onclick="setYearFilter('3')">3</button>
+                <button type="button" class="segmented-btn year-btn" data-year="4" onclick="setYearFilter('4')">4</button>
+              </div>
+            </div>
+
+            <!-- 4. Degree Program -->
+            <div class="form-group">
+              <label for="filter-course" class="form-label">Degree program</label>
+              <select id="filter-course" class="form-select">
+                <option value="">All programs</option>
+              </select>
+            </div>
+
+            <!-- 5. Department -->
+            <div class="form-group">
+              <label for="filter-dept" class="form-label">Department</label>
+              <select id="filter-dept" class="form-select">
+                <option value="">All departments</option>
+              </select>
+            </div>
+
+            <!-- 6. Available Only Toggle Switch -->
+            <div class="form-group">
+              <label class="switch-label">
+                <input type="checkbox" id="filter-available" style="display:none;" onchange="loadStudents()">
+                <span class="switch-track">
+                  <span class="switch-thumb"></span>
+                </span>
+                <span>Available only</span>
+              </label>
+
+              <!-- Availability Dot Legend -->
+              <div class="avail-legend">
+                <span class="avail-legend-item">
+                  <span class="avail-dot avail-true"></span> Available
+                </span>
+                <span class="avail-legend-item">
+                  <span class="avail-dot avail-false"></span> In project
+                </span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Apply filters</button>
+          </form>
+        </aside>
+
+        <!-- Right Roster List -->
+        <section aria-label="Student records">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div id="roster-count-label" class="num-tabular" style="font-size: 0.88rem; color: var(--ink-muted); font-weight: 500;">
+              Loading student roster...
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <label for="sort-dropdown" class="form-label" style="margin-bottom: 0; font-size: 0.85rem;">Sort by:</label>
+              <select id="sort-dropdown" class="form-select" onchange="sortAndRenderRoster()" style="width: auto; padding: 0.3rem 0.6rem; font-size: 0.85rem;">
+                <option value="name">Name (A–Z)</option>
+                <option value="year">Cohort year</option>
+                <option value="skills">Most skills</option>
+                <option value="match">Best match</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="roster-container" class="roster-list">
+            <!-- Skeleton Rows -->
+            <div class="skeleton-row"><div class="skeleton-bar" style="width: 25%;"></div><div class="skeleton-bar" style="width: 45%;"></div><div class="skeleton-bar" style="width: 15%;"></div></div>
+            <div class="skeleton-row"><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 35%;"></div><div class="skeleton-bar" style="width: 20%;"></div></div>
+            <div class="skeleton-row"><div class="skeleton-bar" style="width: 20%;"></div><div class="skeleton-bar" style="width: 50%;"></div><div class="skeleton-bar" style="width: 15%;"></div></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Student Slide Drawer -->
+  <div id="add-drawer-backdrop" class="drawer-backdrop" onclick="closeAddStudentDrawer()"></div>
+  <aside id="add-drawer" class="drawer-panel" aria-label="Add student drawer">
+    <div class="drawer-header">
+      <h2>Add student</h2>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeAddStudentDrawer()">Close</button>
+    </div>
+    <form id="add-student-form" onsubmit="handleAddStudent(event)" class="drawer-body" novalidate>
+      <div class="form-group">
+        <label for="add-student-name" class="form-label">Full name</label>
+        <input type="text" id="add-student-name" class="form-input" placeholder="e.g. Maya Lin">
+      </div>
+      <div class="form-group">
+        <label for="add-student-email" class="form-label">University email</label>
+        <input type="email" id="add-student-email" class="form-input" placeholder="maya.lin@univ.edu">
+      </div>
+      <div class="form-group">
+        <label for="add-student-reg" class="form-label">Registration number</label>
+        <input type="text" id="add-student-reg" class="form-input" placeholder="e.g. 2024CS101">
+      </div>
+      <div class="form-group">
+        <label for="add-student-course" class="form-label">Degree program</label>
+        <select id="add-student-course" class="form-select"></select>
+      </div>
+      <div class="form-group">
+        <label for="add-student-year" class="form-label">Cohort year</label>
+        <select id="add-student-year" class="form-select">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="switch-label">
+          <input type="checkbox" id="add-student-avail" checked style="display:none;">
+          <span class="switch-track">
+            <span class="switch-thumb"></span>
+          </span>
+          <span>Available for project matching</span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label for="add-student-bio" class="form-label">Biography and interests</label>
+        <textarea id="add-student-bio" class="form-textarea" rows="3" placeholder="Technical focus areas, research interests..."></textarea>
+      </div>
+      <div id="add-student-feedback"></div>
+      <div class="drawer-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeAddStudentDrawer()">Cancel</button>
+        <button type="submit" id="btn-create-student" class="btn btn-primary">Add student</button>
+      </div>
+    </form>
+  </aside>
+
+  <script src="/app/js/common.js"></script>
+  <script src="/app/js/students.js"></script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Details & Matching – SkillBridge</title>
+  <link rel="icon" type="image/svg+xml" href="/app/favicon.svg">
+  <link rel="stylesheet" href="/app/css/style.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Left Navigation Rail -->
+    <div id="rail-container"></div>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <div style="margin-bottom: 1.25rem;">
+        <a href="/app/projects.html" class="btn btn-secondary btn-sm">Projects</a>
+      </div>
+
+      <!-- Project Header (Zero Filler Subtitle) -->
+      <header class="view-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+            <h1 id="proj-title" class="view-title">Loading project...</h1>
+            <span id="proj-status-badge" class="status-pill status-open">Open</span>
+          </div>
+          <div style="display: flex; gap: 1.25rem; font-size: 0.88rem; color: var(--ink-muted); flex-wrap: wrap; align-items: center;">
+            <div id="proj-deadline-container">Application deadline: Loading...</div>
+            <span id="proj-email">Contact: Loading...</span>
+          </div>
+        </div>
+        <div id="project-header-actions" style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openEditDrawer()">Edit project</button>
+          <button type="button" id="btn-delete-proj-trigger" class="btn btn-danger btn-sm" onclick="triggerDeleteProjectInline()">Delete project</button>
+          <div id="delete-proj-inline-area"></div>
+        </div>
+      </header>
+
+      <div id="project-notice-area"></div>
+
+      <!-- Project Overview Panel -->
+      <section class="panel">
+        <h2 class="panel-title" style="margin-bottom: 0.75rem;">Project overview and deliverables</h2>
+        <p id="proj-desc" class="prose" style="white-space: pre-line; color: var(--ink-navy);"></p>
+      </section>
+
+      <!-- Skill Requirements Panel -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Skill requirements</h2>
+        </div>
+
+        <!-- Add Requirement Form -->
+        <form id="add-req-form" onsubmit="handleAddRequirement(event)" style="background: var(--paper); border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1.5rem;" novalidate>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 140px; gap: 1rem; align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="add-req-select" class="form-label">Skill</label>
+              <select id="add-req-select" class="form-select"></select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="add-req-min" class="form-label">Minimum proficiency</label>
+              <select id="add-req-min" class="form-select">
+                <option value="1">1 - Beginner</option>
+                <option value="2">2 - Basic</option>
+                <option value="3" selected>3 - Intermediate</option>
+                <option value="4">4 - Advanced</option>
+                <option value="5">5 - Expert</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="add-req-weight" class="form-label">Priority weight</label>
+              <select id="add-req-weight" class="form-select">
+                <option value="1">1 (Low)</option>
+                <option value="2">2 (Minor)</option>
+                <option value="3" selected>3 (Standard)</option>
+                <option value="4">4 (High)</option>
+                <option value="5">5 (Critical)</option>
+              </select>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Add requirement</button>
+            </div>
+          </div>
+          <div id="add-req-feedback"></div>
+        </form>
+
+        <!-- Requirements Ledger (Sentence Case) -->
+        <div class="table-container">
+          <table class="ledger-table" aria-label="Project skill requirements ledger">
+            <thead>
+              <tr>
+                <th scope="col">Skill</th>
+                <th scope="col">Minimum proficiency gauge</th>
+                <th scope="col">Weight</th>
+                <th scope="col" style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="req-skills-tbody">
+              <tr>
+                <td colspan="4">
+                  <div class="skeleton-row"><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 15%;"></div></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Match Results Section -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Match candidates</h2>
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" onclick="findMatches()">Find matches</button>
+            <button type="button" class="btn btn-secondary" onclick="handleAutoShortlist()">Auto-shortlist</button>
+          </div>
+        </div>
+
+        <div id="matches-container">
+          <div class="empty-notice">
+            Select <strong>Find matches</strong> to run the candidate matching algorithm against enrolled students.
+          </div>
+        </div>
+      </section>
+
+      <!-- Shortlist 3-Column Pipeline Section -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Shortlist pipeline</h2>
+        </div>
+
+        <div class="pipeline-grid">
+          <!-- Column 1: Shortlisted -->
+          <div class="pipeline-col">
+            <div class="pipeline-col-header">
+              <span class="pipeline-col-title">Shortlisted</span>
+              <span id="count-shortlisted" class="pipeline-count">0</span>
+            </div>
+            <div id="cards-shortlisted" class="pipeline-cards">
+              <div class="empty-notice" style="margin: 0; padding: 1.5rem 0.5rem; font-size: 0.85rem;">No students in this stage</div>
+            </div>
+          </div>
+
+          <!-- Column 2: Contacted -->
+          <div class="pipeline-col">
+            <div class="pipeline-col-header">
+              <span class="pipeline-col-title">Contacted</span>
+              <span id="count-contacted" class="pipeline-count">0</span>
+            </div>
+            <div id="cards-contacted" class="pipeline-cards">
+              <div class="empty-notice" style="margin: 0; padding: 1.5rem 0.5rem; font-size: 0.85rem;">No students in this stage</div>
+            </div>
+          </div>
+
+          <!-- Column 3: Selected -->
+          <div class="pipeline-col">
+            <div class="pipeline-col-header">
+              <span class="pipeline-col-title">Selected</span>
+              <span id="count-selected" class="pipeline-count">0</span>
+            </div>
+            <div id="cards-selected" class="pipeline-cards">
+              <div class="empty-notice" style="margin: 0; padding: 1.5rem 0.5rem; font-size: 0.85rem;">No students in this stage</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Side Drawer for Editing Project -->
+  <div id="edit-drawer-backdrop" class="drawer-backdrop" onclick="closeEditDrawer()"></div>
+  <aside id="edit-drawer" class="drawer-panel" aria-label="Edit project panel">
+    <div class="drawer-header">
+      <h2>Edit project</h2>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeEditDrawer()">Close</button>
+    </div>
+    <form id="edit-project-form" onsubmit="handleSaveProject(event)" class="drawer-body" novalidate>
+      <div class="form-group">
+        <label for="edit-proj-title" class="form-label">Project title</label>
+        <input type="text" id="edit-proj-title" class="form-input">
+      </div>
+      <div class="form-group">
+        <label for="edit-proj-desc" class="form-label">Description and deliverables</label>
+        <textarea id="edit-proj-desc" class="form-textarea" rows="5"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="edit-proj-status" class="form-label">Status</label>
+        <select id="edit-proj-status" class="form-select">
+          <option value="open">Open</option>
+          <option value="in_progress">In progress</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="edit-proj-deadline" class="form-label">Application deadline</label>
+        <input type="date" id="edit-proj-deadline" class="form-input">
+      </div>
+      <div class="form-group">
+        <label for="edit-proj-email" class="form-label">Faculty contact email</label>
+        <input type="email" id="edit-proj-email" class="form-input">
+      </div>
+      <div id="edit-feedback-area"></div>
+      <div class="drawer-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeEditDrawer()">Cancel</button>
+        <button type="submit" id="btn-save-project" class="btn btn-primary">Save project</button>
+      </div>
+    </form>
+  </aside>
+
+  <script src="/app/js/common.js"></script>
+  <script src="/app/js/project.js"></script>
+</body>
+</html>
