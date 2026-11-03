@@ -21,6 +21,11 @@ async function initStudentProfile() {
     railContainer.innerHTML = renderRailNav("students");
   }
 
+  const headerContainer = document.getElementById("header-container");
+  if (headerContainer) {
+    headerContainer.innerHTML = renderTopHeader();
+  }
+
   if (!studentId || isNaN(studentId)) {
     showInlineNotice("profile-global-notice", "Invalid or missing student identifier. Redirecting to roster...", "error");
     setTimeout(() => { window.location.href = "/app/students.html"; }, 1500);

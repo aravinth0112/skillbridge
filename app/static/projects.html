@@ -3,63 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projects That Need People – SkillBridge</title>
+  <title>Projects – SkillBridge</title>
   <link rel="icon" type="image/svg+xml" href="/app/favicon.svg">
   <link rel="stylesheet" href="/app/css/style.css">
   <style>
+    .wizard-steps {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .wizard-step-tab {
+      flex: 1;
+      padding: 0.65rem 0.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all var(--t-fast);
+    }
+    .wizard-step-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
     .wizard-nav {
       display: flex;
       justify-content: space-between;
       margin-top: 1.5rem;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--border-subtle);
       padding-top: 1rem;
     }
     .stepper-control {
       display: inline-flex;
       align-items: center;
       border: 1px solid var(--border);
-      background: var(--surface);
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      overflow: hidden;
     }
     .stepper-btn {
-      width: 32px;
-      height: 32px;
-      background: var(--surface);
+      width: 36px;
+      height: 36px;
+      background: var(--bg-surface);
       border: none;
       font-size: 1.1rem;
       cursor: pointer;
-      color: var(--ink-navy);
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      line-height: 1;
     }
     .stepper-btn:hover {
-      background: var(--paper);
+      background: var(--bg-card-hover);
     }
     .stepper-val {
-      width: 32px;
+      width: 36px;
       text-align: center;
       font-weight: 600;
       font-size: 0.95rem;
       font-variant-numeric: tabular-nums;
     }
+    .quick-picks {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .quick-pick-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.6rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all var(--t-fast);
+    }
+    .quick-pick-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
     .pending-req-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.45rem 0.65rem;
-      background: var(--paper);
+      padding: 0.6rem 0.85rem;
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      margin-bottom: 0.4rem;
-      font-size: 0.82rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
     }
     .compact-req-tag {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      background: var(--paper);
-      padding: 0.2rem 0.45rem;
+      background: var(--bg-surface);
+      padding: 0.25rem 0.55rem;
       border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       font-size: 0.8rem;
       white-space: nowrap;
     }
@@ -68,178 +109,194 @@
 <body>
 
   <div class="app-layout">
-    <!-- Left Navigation Rail -->
+    <!-- Left Navigation Rail (Injected by common.js) -->
     <div id="rail-container"></div>
 
-    <!-- Main Workspace -->
-    <main class="main-content">
-      <header class="view-header">
-        <h1 class="view-title">Projects that need people</h1>
-        <div>
-          <button type="button" class="btn btn-primary" onclick="openNewProjectDrawer()">New project</button>
-        </div>
-      </header>
+    <!-- App Main Wrapper -->
+    <div class="app-main-wrapper">
+      <!-- Top Navigation Header (Injected by common.js) -->
+      <div id="header-container"></div>
 
-      <div id="projects-notice-area"></div>
+      <!-- Main Workspace -->
+      <main class="main-content">
+        <header class="panel-header" style="margin-bottom: 1.5rem;">
+          <div>
+            <h1 class="panel-title" style="font-size: 1.6rem; letter-spacing: -0.02em;">Projects That Need People</h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">Active research initiatives and software projects matching qualified students.</p>
+          </div>
+          <div>
+            <button type="button" class="btn btn-primary" onclick="openNewProjectDrawer()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>New Project</span>
+            </button>
+          </div>
+        </header>
 
-      <!-- Controls: Status Filter & Project Count -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <label for="filter-status" class="form-label" style="margin-bottom: 0;">Status filter:</label>
-          <select id="filter-status" class="form-select" onchange="loadProjects()" style="width: auto; padding: 0.35rem 0.65rem;">
-            <option value="">All statuses</option>
-            <option value="open">Open</option>
-            <option value="in_progress">In progress</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-        <div id="projects-count" class="num-tabular" style="font-size: 0.88rem; color: var(--ink-muted);">
-          Loading projects...
-        </div>
-      </div>
+        <div id="projects-notice-area"></div>
 
-      <!-- Projects Directory Ledger -->
-      <div class="table-container">
-        <table class="ledger-table" aria-label="Projects directory table">
-          <thead>
-            <tr>
-              <th scope="col" style="min-width: 200px;">Project title</th>
-              <th scope="col" style="width: 110px;">Status</th>
-              <th scope="col" style="min-width: 170px;">Application deadline</th>
-              <th scope="col" style="min-width: 200px;">Top skill requirements</th>
-              <th scope="col" style="text-align: right; width: 130px;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="projects-tbody">
-            <tr>
-              <td colspan="5">
-                <div class="skeleton-row"><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 15%;"></div><div class="skeleton-bar" style="width: 20%;"></div><div class="skeleton-bar" style="width: 20%;"></div></div>
-                <div class="skeleton-row"><div class="skeleton-bar" style="width: 25%;"></div><div class="skeleton-bar" style="width: 15%;"></div><div class="skeleton-bar" style="width: 20%;"></div><div class="skeleton-bar" style="width: 20%;"></div></div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
+        <!-- Controls: Status Filter & Project Count -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <label for="filter-status" class="form-label" style="margin-bottom: 0;">Status Filter:</label>
+            <select id="filter-status" class="form-select" onchange="loadProjects()" style="width: auto; padding: 0.35rem 0.85rem;">
+              <option value="">All Statuses</option>
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div id="projects-count" class="num-tabular" style="font-size: 0.88rem; color: var(--text-secondary); font-weight: 500;">
+            Loading projects...
+          </div>
+        </div>
+
+        <!-- Projects Directory Ledger -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-container">
+            <table class="data-table" aria-label="Projects directory table">
+              <thead>
+                <tr>
+                  <th scope="col" style="min-width: 220px;">Project Title</th>
+                  <th scope="col" style="width: 120px;">Status</th>
+                  <th scope="col" style="min-width: 180px;">Application Deadline</th>
+                  <th scope="col" style="min-width: 220px;">Required Competencies</th>
+                  <th scope="col" style="text-align: right; width: 140px;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="projects-tbody">
+                <tr>
+                  <td colspan="5">
+                    <div class="skeleton-row"><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 15%;"></div><div class="skeleton-bar" style="width: 20%;"></div></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 
   <!-- New Project 3-Step Wizard Drawer -->
-  <div id="new-project-backdrop" class="drawer-backdrop" onclick="closeNewProjectDrawer()"></div>
-  <aside id="new-project-drawer" class="drawer-panel" style="width: 520px;" aria-label="Create project wizard">
-    <div class="drawer-header">
-      <h2>New project</h2>
-      <button type="button" class="btn btn-secondary btn-sm" onclick="closeNewProjectDrawer()">Close</button>
-    </div>
+  <div id="new-project-backdrop" class="drawer-backdrop" onclick="closeNewProjectDrawer()">
+    <aside id="new-project-drawer" class="drawer-panel" style="max-width: 540px;" aria-label="Create project wizard" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">Create New Project</h2>
+        <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.65rem;" onclick="closeNewProjectDrawer()">✕</button>
+      </div>
 
-    <!-- 3-Step Tab Header -->
-    <div class="wizard-steps">
-      <div id="wizard-tab-1" class="wizard-step-tab active">1. Details</div>
-      <div id="wizard-tab-2" class="wizard-step-tab">2. Requirements</div>
-      <div id="wizard-tab-3" class="wizard-step-tab">3. Review</div>
-    </div>
+      <!-- 3-Step Tab Header -->
+      <div class="wizard-steps">
+        <div id="wizard-tab-1" class="wizard-step-tab active">1. Details</div>
+        <div id="wizard-tab-2" class="wizard-step-tab">2. Requirements</div>
+        <div id="wizard-tab-3" class="wizard-step-tab">3. Review</div>
+      </div>
 
-    <form id="wizard-form" onsubmit="handleWizardSubmit(event)" class="drawer-body" style="padding: 0; overflow-x: hidden;" novalidate>
-      <div class="wizard-viewport">
-        <div id="wizard-steps-container" class="wizard-steps-container">
-          <!-- Step 1: Details -->
-          <div id="wizard-step-1" class="wizard-step-pane">
-            <div class="form-group">
-              <label for="step-title" class="form-label">Project title</label>
-              <input type="text" id="step-title" class="form-input" placeholder="e.g. Autonomous Campus Rover">
-            </div>
-            <div class="form-group">
-              <label for="step-desc" class="form-label">Description and deliverables</label>
-              <textarea id="step-desc" class="form-textarea" rows="4" placeholder="Objectives, scope, and technical responsibilities..."></textarea>
-            </div>
-            <div class="form-group">
-              <label for="step-email" class="form-label">Faculty contact email</label>
-              <input type="email" id="step-email" class="form-input" placeholder="faculty@univ.edu">
-            </div>
-            <div class="form-group">
-              <label for="step-status" class="form-label">Status</label>
-              <select id="step-status" class="form-select">
-                <option value="open" selected>Open</option>
-                <option value="in_progress">In progress</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Application deadline</label>
-              <!-- Quick Picks -->
-              <div class="quick-picks">
-                <button type="button" class="quick-pick-btn" onclick="applyQuickPick(14)">2 weeks</button>
-                <button type="button" class="quick-pick-btn" onclick="applyQuickPick(30)">1 month</button>
-                <button type="button" class="quick-pick-btn" onclick="applyQuickPick(90)">3 months</button>
+      <form id="wizard-form" onsubmit="handleWizardSubmit(event)" style="padding: 0;" novalidate>
+        <div class="wizard-viewport">
+          <div id="wizard-steps-container">
+            <!-- Step 1: Details -->
+            <div id="wizard-step-1" class="wizard-step-pane">
+              <div class="form-group">
+                <label for="step-title" class="form-label">Project Title</label>
+                <input type="text" id="step-title" class="form-input" placeholder="e.g. Autonomous Campus Rover">
               </div>
-              <input type="date" id="step-deadline" class="form-input">
-            </div>
-            <div class="wizard-nav">
-              <div></div>
-              <button type="button" class="btn btn-primary" onclick="goToStep(2)">Next: Requirements</button>
-            </div>
-          </div>
-
-          <!-- Step 2: Requirements -->
-          <div id="wizard-step-2" class="wizard-step-pane">
-            <h3 style="font-size: 0.95rem; margin-bottom: 0.85rem;">Add required technical competencies</h3>
-            <div class="form-group">
-              <label for="builder-skill" class="form-label">Skill</label>
-              <select id="builder-skill" class="form-select"></select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Minimum proficiency gauge</label>
-              <div id="builder-gauge-container"></div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Priority weight (1-5)</label>
-              <div class="stepper-control">
-                <button type="button" class="stepper-btn" onclick="stepWeight(-1)" aria-label="Decrease weight">-</button>
-                <span id="builder-weight-val" class="stepper-val">3</span>
-                <button type="button" class="stepper-btn" onclick="stepWeight(1)" aria-label="Increase weight">+</button>
+              <div class="form-group">
+                <label for="step-desc" class="form-label">Description & Deliverables</label>
+                <textarea id="step-desc" class="form-textarea" rows="4" placeholder="Objectives, scope, and technical responsibilities..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="step-email" class="form-label">Faculty Contact Email</label>
+                <input type="email" id="step-email" class="form-input" placeholder="faculty@univ.edu">
+              </div>
+              <div class="form-group">
+                <label for="step-status" class="form-label">Initial Status</label>
+                <select id="step-status" class="form-select">
+                  <option value="open" selected>Open</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Application Deadline</label>
+                <div class="quick-picks">
+                  <button type="button" class="quick-pick-btn" onclick="applyQuickPick(14)">2 weeks</button>
+                  <button type="button" class="quick-pick-btn" onclick="applyQuickPick(30)">1 month</button>
+                  <button type="button" class="quick-pick-btn" onclick="applyQuickPick(90)">3 months</button>
+                </div>
+                <input type="date" id="step-deadline" class="form-input">
+              </div>
+              <div class="wizard-nav">
+                <div></div>
+                <button type="button" class="btn btn-primary" onclick="goToStep(2)">Next: Requirements →</button>
               </div>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="addPendingRequirement()" style="margin-bottom: 1rem; width: 100%;">
-              Add requirement to project
-            </button>
 
-            <div id="builder-feedback"></div>
-
-            <h4 style="font-size: 0.88rem; margin: 1rem 0 0.5rem; color: var(--ink-muted);">Requirements to be created:</h4>
-            <div id="pending-reqs-list">
-              <div style="font-size: 0.82rem; color: var(--ink-subtle);">No requirements added yet.</div>
-            </div>
-
-            <div class="wizard-nav">
-              <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Back</button>
-              <button type="button" class="btn btn-primary" onclick="goToStep(3)">Next: Review</button>
-            </div>
-          </div>
-
-          <!-- Step 3: Review -->
-          <div id="wizard-step-3" class="wizard-step-pane">
-            <h3 style="font-size: 0.95rem; margin-bottom: 0.85rem;">Review project summary</h3>
-            <div class="panel" style="padding: 1rem; background: var(--paper); border: 1px solid var(--border); margin-bottom: 1rem;">
-              <div style="margin-bottom: 0.5rem;">
-                <strong id="review-title" style="font-size: 1.05rem; color: var(--ink-navy);">---</strong>
+            <!-- Step 2: Requirements -->
+            <div id="wizard-step-2" class="wizard-step-pane" style="display: none;">
+              <h3 style="font-size: 0.95rem; margin-bottom: 0.85rem; color: var(--text-primary);">Add Required Technical Competencies</h3>
+              <div class="form-group">
+                <label for="builder-skill" class="form-label">Skill</label>
+                <select id="builder-skill" class="form-select"></select>
               </div>
-              <div id="review-meta" style="font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 0.5rem;"></div>
-              <p id="review-desc" style="font-size: 0.85rem; color: var(--ink-navy); white-space: pre-line;"></p>
+              <div class="form-group">
+                <label class="form-label">Minimum Proficiency</label>
+                <div id="builder-gauge-container"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Priority Weight (1-5)</label>
+                <div class="stepper-control">
+                  <button type="button" class="stepper-btn" onclick="stepWeight(-1)" aria-label="Decrease weight">-</button>
+                  <span id="builder-weight-val" class="stepper-val">3</span>
+                  <button type="button" class="stepper-btn" onclick="stepWeight(1)" aria-label="Increase weight">+</button>
+                </div>
+              </div>
+              <button type="button" class="btn btn-secondary" onclick="addPendingRequirement()" style="margin-bottom: 1rem; width: 100%;">
+                + Add Requirement
+              </button>
+
+              <div id="builder-feedback"></div>
+
+              <h4 style="font-size: 0.88rem; margin: 1rem 0 0.5rem; color: var(--text-secondary);">Project Requirements:</h4>
+              <div id="pending-reqs-list">
+                <div style="font-size: 0.82rem; color: var(--text-muted);">No requirements added yet.</div>
+              </div>
+
+              <div class="wizard-nav">
+                <button type="button" class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+                <button type="button" class="btn btn-primary" onclick="goToStep(3)">Next: Review →</button>
+              </div>
             </div>
 
-            <h4 style="font-size: 0.88rem; margin-bottom: 0.5rem; color: var(--ink-muted);">Configured requirements:</h4>
-            <div id="review-reqs-list" style="margin-bottom: 1.25rem;"></div>
+            <!-- Step 3: Review -->
+            <div id="wizard-step-3" class="wizard-step-pane" style="display: none;">
+              <h3 style="font-size: 0.95rem; margin-bottom: 0.85rem; color: var(--text-primary);">Review Project Summary</h3>
+              <div class="card" style="padding: 1rem; background: var(--bg-surface); margin-bottom: 1rem;">
+                <div style="margin-bottom: 0.5rem;">
+                  <strong id="review-title" style="font-size: 1.05rem; color: var(--text-primary);">---</strong>
+                </div>
+                <div id="review-meta" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;"></div>
+                <p id="review-desc" style="font-size: 0.85rem; color: var(--text-primary); white-space: pre-line;"></p>
+              </div>
 
-            <div id="wizard-create-feedback"></div>
+              <h4 style="font-size: 0.88rem; margin-bottom: 0.5rem; color: var(--text-secondary);">Configured Requirements:</h4>
+              <div id="review-reqs-list" style="margin-bottom: 1.25rem;"></div>
 
-            <div class="wizard-nav">
-              <button type="button" class="btn btn-secondary" onclick="goToStep(2)">Back</button>
-              <button type="submit" id="btn-create-submit" class="btn btn-primary">Create project</button>
+              <div id="wizard-create-feedback"></div>
+
+              <div class="wizard-nav">
+                <button type="button" class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+                <button type="submit" id="btn-create-submit" class="btn btn-primary">Publish Project</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </form>
-  </aside>
+      </form>
+    </aside>
+  </div>
 
   <script src="/app/js/common.js"></script>
   <script src="/app/js/projects.js"></script>

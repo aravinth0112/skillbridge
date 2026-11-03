@@ -3,211 +3,264 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Details & Matching – SkillBridge</title>
+  <title>Project Details & Candidate Matcher – SkillBridge</title>
   <link rel="icon" type="image/svg+xml" href="/app/favicon.svg">
   <link rel="stylesheet" href="/app/css/style.css">
+  <style>
+    .match-candidate-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.15rem 1.25rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 0.85rem;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      transition: all var(--t-fast);
+    }
+    .match-candidate-row:hover {
+      border-color: var(--primary);
+      background: var(--bg-card-hover);
+    }
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 1024px) {
+      .pipeline-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <div class="app-layout">
-    <!-- Left Navigation Rail -->
+    <!-- Left Navigation Rail (Injected by common.js) -->
     <div id="rail-container"></div>
 
-    <!-- Main Workspace -->
-    <main class="main-content">
-      <div style="margin-bottom: 1.25rem;">
-        <a href="/app/projects.html" class="btn btn-secondary btn-sm">Projects</a>
-      </div>
+    <!-- App Main Wrapper -->
+    <div class="app-main-wrapper">
+      <!-- Top Navigation Header (Injected by common.js) -->
+      <div id="header-container"></div>
 
-      <!-- Project Header (Zero Filler Subtitle) -->
-      <header class="view-header">
-        <div>
-          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-            <h1 id="proj-title" class="view-title">Loading project...</h1>
-            <span id="proj-status-badge" class="status-pill status-open">Open</span>
+      <!-- Main Workspace -->
+      <main class="main-content">
+        <div style="margin-bottom: 1.25rem;">
+          <a href="/app/projects.html" class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.82rem;">← Back to Projects</a>
+        </div>
+
+        <!-- Project Header Card -->
+        <header class="card" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+              <h1 id="proj-title" class="panel-title" style="font-size: 1.6rem; letter-spacing: -0.02em;">Loading project...</h1>
+              <span id="proj-status-badge" class="badge badge-open">Open</span>
+            </div>
+            <div style="display: flex; gap: 1.25rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; align-items: center;">
+              <div id="proj-deadline-container">Application deadline: Loading...</div>
+              <span id="proj-email">Contact: Loading...</span>
+            </div>
           </div>
-          <div style="display: flex; gap: 1.25rem; font-size: 0.88rem; color: var(--ink-muted); flex-wrap: wrap; align-items: center;">
-            <div id="proj-deadline-container">Application deadline: Loading...</div>
-            <span id="proj-email">Contact: Loading...</span>
+          <div id="project-header-actions" style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.82rem;" onclick="openEditDrawer()">Edit Project</button>
+            <button type="button" id="btn-delete-proj-trigger" class="btn btn-danger" style="padding: 0.45rem 0.85rem; font-size: 0.82rem;" onclick="triggerDeleteProjectInline()">Delete Project</button>
+            <div id="delete-proj-inline-area"></div>
           </div>
-        </div>
-        <div id="project-header-actions" style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="openEditDrawer()">Edit project</button>
-          <button type="button" id="btn-delete-proj-trigger" class="btn btn-danger btn-sm" onclick="triggerDeleteProjectInline()">Delete project</button>
-          <div id="delete-proj-inline-area"></div>
-        </div>
-      </header>
+        </header>
 
-      <div id="project-notice-area"></div>
+        <div id="project-notice-area"></div>
 
-      <!-- Project Overview Panel -->
-      <section class="panel">
-        <h2 class="panel-title" style="margin-bottom: 0.75rem;">Project overview and deliverables</h2>
-        <p id="proj-desc" class="prose" style="white-space: pre-line; color: var(--ink-navy);"></p>
-      </section>
+        <!-- Project Overview Card -->
+        <section class="card" style="margin-bottom: 1.5rem;">
+          <h2 class="panel-title" style="margin-bottom: 0.75rem; font-size: 1.15rem;">Project Overview & Deliverables</h2>
+          <p id="proj-desc" style="white-space: pre-line; color: var(--text-primary); line-height: 1.6; font-size: 0.95rem;"></p>
+        </section>
 
-      <!-- Skill Requirements Panel -->
-      <section class="panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Skill requirements</h2>
-        </div>
-
-        <!-- Add Requirement Form -->
-        <form id="add-req-form" onsubmit="handleAddRequirement(event)" style="background: var(--paper); border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1.5rem;" novalidate>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 140px; gap: 1rem; align-items: flex-end;">
-            <div class="form-group" style="margin-bottom: 0;">
-              <label for="add-req-select" class="form-label">Skill</label>
-              <select id="add-req-select" class="form-select"></select>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label for="add-req-min" class="form-label">Minimum proficiency</label>
-              <select id="add-req-min" class="form-select">
-                <option value="1">1 - Beginner</option>
-                <option value="2">2 - Basic</option>
-                <option value="3" selected>3 - Intermediate</option>
-                <option value="4">4 - Advanced</option>
-                <option value="5">5 - Expert</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label for="add-req-weight" class="form-label">Priority weight</label>
-              <select id="add-req-weight" class="form-select">
-                <option value="1">1 (Low)</option>
-                <option value="2">2 (Minor)</option>
-                <option value="3" selected>3 (Standard)</option>
-                <option value="4">4 (High)</option>
-                <option value="5">5 (Critical)</option>
-              </select>
-            </div>
+        <!-- Skill Requirements Card -->
+        <section class="card" style="margin-bottom: 1.5rem;">
+          <div class="panel-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
             <div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">Add requirement</button>
-            </div>
-          </div>
-          <div id="add-req-feedback"></div>
-        </form>
-
-        <!-- Requirements Ledger (Sentence Case) -->
-        <div class="table-container">
-          <table class="ledger-table" aria-label="Project skill requirements ledger">
-            <thead>
-              <tr>
-                <th scope="col">Skill</th>
-                <th scope="col">Minimum proficiency gauge</th>
-                <th scope="col">Weight</th>
-                <th scope="col" style="text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody id="req-skills-tbody">
-              <tr>
-                <td colspan="4">
-                  <div class="skeleton-row"><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 15%;"></div></div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Match Results Section -->
-      <section class="panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Match candidates</h2>
-          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
-            <button type="button" class="btn btn-primary" onclick="findMatches()">Find matches</button>
-            <button type="button" class="btn btn-secondary" onclick="handleAutoShortlist()">Auto-shortlist</button>
-          </div>
-        </div>
-
-        <div id="matches-container">
-          <div class="empty-notice">
-            Select <strong>Find matches</strong> to run the candidate matching algorithm against enrolled students.
-          </div>
-        </div>
-      </section>
-
-      <!-- Shortlist 3-Column Pipeline Section -->
-      <section class="panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Shortlist pipeline</h2>
-        </div>
-
-        <div class="pipeline-grid">
-          <!-- Column 1: Shortlisted -->
-          <div class="pipeline-col">
-            <div class="pipeline-col-header">
-              <span class="pipeline-col-title">Shortlisted</span>
-              <span id="count-shortlisted" class="pipeline-count">0</span>
-            </div>
-            <div id="cards-shortlisted" class="pipeline-cards">
-              <div class="empty-notice" style="margin: 0; padding: 1.5rem 0.5rem; font-size: 0.85rem;">No students in this stage</div>
+              <h2 class="panel-title" style="font-size: 1.15rem;">Required Technical Competencies</h2>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Skills and proficiency standards candidates must possess to be eligible.</p>
             </div>
           </div>
 
-          <!-- Column 2: Contacted -->
-          <div class="pipeline-col">
-            <div class="pipeline-col-header">
-              <span class="pipeline-col-title">Contacted</span>
-              <span id="count-contacted" class="pipeline-count">0</span>
+          <!-- Add Requirement Form -->
+          <form id="add-req-form" onsubmit="handleAddRequirement(event)" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;" novalidate>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 140px; gap: 1rem; align-items: flex-end;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="add-req-select" class="form-label">Skill Catalog</label>
+                <select id="add-req-select" class="form-select"></select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="add-req-min" class="form-label">Minimum Level</label>
+                <select id="add-req-min" class="form-select">
+                  <option value="1">1 - Beginner</option>
+                  <option value="2">2 - Basic</option>
+                  <option value="3" selected>3 - Intermediate</option>
+                  <option value="4">4 - Advanced</option>
+                  <option value="5">5 - Expert</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="add-req-weight" class="form-label">Priority Weight</label>
+                <select id="add-req-weight" class="form-select">
+                  <option value="1">1 (Low)</option>
+                  <option value="2">2 (Minor)</option>
+                  <option value="3" selected>3 (Standard)</option>
+                  <option value="4">4 (High)</option>
+                  <option value="5">5 (Critical)</option>
+                </select>
+              </div>
+              <div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 40px; padding: 0.5rem;">+ Add Skill</button>
+              </div>
             </div>
-            <div id="cards-contacted" class="pipeline-cards">
-              <div class="empty-notice" style="margin: 0; padding: 1.5rem 0.5rem; font-size: 0.85rem;">No students in this stage</div>
+            <div id="add-req-feedback"></div>
+          </form>
+
+          <!-- Requirements Ledger -->
+          <div class="table-container">
+            <table class="data-table" aria-label="Project skill requirements ledger">
+              <thead>
+                <tr>
+                  <th scope="col">Skill</th>
+                  <th scope="col">Minimum Proficiency Standard</th>
+                  <th scope="col">Importance Weight</th>
+                  <th scope="col" style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="req-skills-tbody">
+                <tr>
+                  <td colspan="4">
+                    <div class="skeleton-row"><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 15%;"></div></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Match Results Section -->
+        <section class="card" style="margin-bottom: 1.5rem;">
+          <div class="panel-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+            <div>
+              <h2 class="panel-title" style="font-size: 1.15rem;">Candidate Matching Engine</h2>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Ranks enrolled students based on weighted proficiency and verification bonuses.</p>
+            </div>
+            <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary" onclick="findMatches()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>Find Matches</span>
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="handleAutoShortlist()">Auto-Shortlist Top Candidates</button>
             </div>
           </div>
 
-          <!-- Column 3: Selected -->
-          <div class="pipeline-col">
-            <div class="pipeline-col-header">
-              <span class="pipeline-col-title">Selected</span>
-              <span id="count-selected" class="pipeline-count">0</span>
-            </div>
-            <div id="cards-selected" class="pipeline-cards">
-              <div class="empty-notice" style="margin: 0; padding: 1.5rem 0.5rem; font-size: 0.85rem;">No students in this stage</div>
+          <div id="matches-container">
+            <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 0.9rem;">
+              Click <strong>Find Matches</strong> to run the candidate matching algorithm against enrolled students.
             </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+
+        <!-- Shortlist 3-Column Pipeline Section -->
+        <section class="card">
+          <div class="panel-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+            <div>
+              <h2 class="panel-title" style="font-size: 1.15rem;">Candidate Shortlist Pipeline</h2>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Track candidate review, outreach, and final project placement.</p>
+            </div>
+          </div>
+
+          <div class="pipeline-grid">
+            <!-- Column 1: Shortlisted -->
+            <div class="pipeline-col">
+              <div class="pipeline-col-header">
+                <span style="font-weight: 700; color: var(--text-primary);">Shortlisted</span>
+                <span id="count-shortlisted" class="badge badge-open">0</span>
+              </div>
+              <div id="cards-shortlisted" class="pipeline-cards" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="text-align: center; padding: 1.5rem 0.5rem; font-size: 0.85rem; color: var(--text-muted);">No candidates in this stage</div>
+              </div>
+            </div>
+
+            <!-- Column 2: Contacted -->
+            <div class="pipeline-col">
+              <div class="pipeline-col-header">
+                <span style="font-weight: 700; color: var(--text-primary);">Contacted</span>
+                <span id="count-contacted" class="badge badge-open">0</span>
+              </div>
+              <div id="cards-contacted" class="pipeline-cards" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="text-align: center; padding: 1.5rem 0.5rem; font-size: 0.85rem; color: var(--text-muted);">No candidates in this stage</div>
+              </div>
+            </div>
+
+            <!-- Column 3: Selected -->
+            <div class="pipeline-col">
+              <div class="pipeline-col-header">
+                <span style="font-weight: 700; color: var(--text-primary);">Selected</span>
+                <span id="count-selected" class="badge badge-open">0</span>
+              </div>
+              <div id="cards-selected" class="pipeline-cards" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="text-align: center; padding: 1.5rem 0.5rem; font-size: 0.85rem; color: var(--text-muted);">No candidates in this stage</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   </div>
 
   <!-- Side Drawer for Editing Project -->
-  <div id="edit-drawer-backdrop" class="drawer-backdrop" onclick="closeEditDrawer()"></div>
-  <aside id="edit-drawer" class="drawer-panel" aria-label="Edit project panel">
-    <div class="drawer-header">
-      <h2>Edit project</h2>
-      <button type="button" class="btn btn-secondary btn-sm" onclick="closeEditDrawer()">Close</button>
-    </div>
-    <form id="edit-project-form" onsubmit="handleSaveProject(event)" class="drawer-body" novalidate>
-      <div class="form-group">
-        <label for="edit-proj-title" class="form-label">Project title</label>
-        <input type="text" id="edit-proj-title" class="form-input">
+  <div id="edit-drawer-backdrop" class="drawer-backdrop" onclick="closeEditDrawer()">
+    <aside id="edit-drawer" class="drawer-panel" aria-label="Edit project panel" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">Edit Project Details</h2>
+        <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.65rem;" onclick="closeEditDrawer()">✕</button>
       </div>
-      <div class="form-group">
-        <label for="edit-proj-desc" class="form-label">Description and deliverables</label>
-        <textarea id="edit-proj-desc" class="form-textarea" rows="5"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="edit-proj-status" class="form-label">Status</label>
-        <select id="edit-proj-status" class="form-select">
-          <option value="open">Open</option>
-          <option value="in_progress">In progress</option>
-          <option value="completed">Completed</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="edit-proj-deadline" class="form-label">Application deadline</label>
-        <input type="date" id="edit-proj-deadline" class="form-input">
-      </div>
-      <div class="form-group">
-        <label for="edit-proj-email" class="form-label">Faculty contact email</label>
-        <input type="email" id="edit-proj-email" class="form-input">
-      </div>
-      <div id="edit-feedback-area"></div>
-      <div class="drawer-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeEditDrawer()">Cancel</button>
-        <button type="submit" id="btn-save-project" class="btn btn-primary">Save project</button>
-      </div>
-    </form>
-  </aside>
+
+      <form id="edit-project-form" onsubmit="handleSaveProject(event)" novalidate>
+        <div class="form-group">
+          <label for="edit-proj-title" class="form-label">Project Title</label>
+          <input type="text" id="edit-proj-title" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="edit-proj-desc" class="form-label">Description & Deliverables</label>
+          <textarea id="edit-proj-desc" class="form-textarea" rows="5"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-proj-status" class="form-label">Status</label>
+          <select id="edit-proj-status" class="form-select">
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-proj-deadline" class="form-label">Application Deadline</label>
+          <input type="date" id="edit-proj-deadline" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="edit-proj-email" class="form-label">Faculty Contact Email</label>
+          <input type="email" id="edit-proj-email" class="form-input">
+        </div>
+        <div id="edit-feedback-area"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeEditDrawer()">Cancel</button>
+          <button type="submit" id="btn-save-project" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </aside>
+  </div>
 
   <script src="/app/js/common.js"></script>
   <script src="/app/js/project.js"></script>

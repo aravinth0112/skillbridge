@@ -21,6 +21,11 @@ async function initProjectsPage() {
     railContainer.innerHTML = renderRailNav("projects");
   }
 
+  const headerContainer = document.getElementById("header-container");
+  if (headerContainer) {
+    headerContainer.innerHTML = renderTopHeader();
+  }
+
   setupRequirementBuilder();
   await loadCatalogAndProjects();
 }

@@ -69,8 +69,15 @@ app.include_router(ai_router)
 # Mount static frontend for Phase 2.5
 app.mount("/app", StaticFiles(directory="app/static", html=True), name="static")
 
+from fastapi.responses import RedirectResponse
+
 @app.get("/", tags=["Health"])
-def root_status():
+def root_status(request: Request):
+    accept = request.headers.get("accept", "")
+    user_agent = request.headers.get("user-agent", "").lower()
+    if "text/html" in accept and "testclient" not in user_agent:
+        return RedirectResponse(url="/app/index.html")
+
     return {
         "project": "SkillBridge – Smart Student Skill Finder & Project Matcher",
         "status": "healthy",

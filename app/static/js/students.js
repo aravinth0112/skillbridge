@@ -24,6 +24,11 @@ async function initStudentsPage() {
     railContainer.innerHTML = renderRailNav("students");
   }
 
+  const headerContainer = document.getElementById("header-container");
+  if (headerContainer) {
+    headerContainer.innerHTML = renderTopHeader();
+  }
+
   setupSkillPicker();
   await loadFilterCatalogs();
 

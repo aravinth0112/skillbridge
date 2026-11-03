@@ -22,6 +22,11 @@ async function initProjectDetail() {
     railContainer.innerHTML = renderRailNav("projects");
   }
 
+  const headerContainer = document.getElementById("header-container");
+  if (headerContainer) {
+    headerContainer.innerHTML = renderTopHeader();
+  }
+
   if (!projectId || isNaN(projectId)) {
     showInlineNotice("project-notice-area", "Invalid or missing project identifier. Redirecting to projects list...", "error");
     setTimeout(() => { window.location.href = "/app/projects.html"; }, 1500);
