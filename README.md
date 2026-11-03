@@ -147,7 +147,7 @@ This populates 4 departments, 5 degree programs, 22 technical skills, 38 realist
 
 ### 5. Run the Application Server
 ```powershell
-py -3.11 -m uvicorn app.main:app --reload
+py -3.11 -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 Once running, open your browser:
 - **Web Dashboard**: [http://127.0.0.1:8000/app/index.html](http://127.0.0.1:8000/app/index.html)
@@ -199,23 +199,25 @@ $$\text{Verified Bonus} = 5.0 \times \left( \frac{\text{verified\_matched\_skill
 
 $$\text{Final Score} = \min(100.0, \text{round}(\text{Base Score} + \text{Verified Bonus}, 1))$$
 
-### Worked Calculation Example
-**Project Requirements**:
-1. **Python**: Required Level = 4, Weight = 3
-2. **FastAPI**: Required Level = 2, Weight = 2
-3. **Docker**: Required Level = 3, Weight = 1
-- **Total Weight** = $3 + 2 + 1 = 6$
+### Worked Calculation Example (Real Data from `seed.py`)
+**Project: Campus AI Assistant (ID: 1)**:
+1. **Python**: Required Level = 3, Weight = 5
+2. **FastAPI**: Required Level = 3, Weight = 4
+3. **PyTorch**: Required Level = 2, Weight = 3
+- **Total Weight** = $5 + 4 + 3 = 12$
 
-**Student Profile**:
-- **Python**: Level = 2 (Unverified) $\rightarrow \text{Ratio} = \min(2/4, 1.0) = 0.5 \rightarrow \text{Contribution} = 3 \times 0.5 = 1.5$
-- **FastAPI**: Level = 4 (Verified) $\rightarrow \text{Ratio} = \min(4/2, 1.0) = 1.0 \rightarrow \text{Contribution} = 2 \times 1.0 = 2.0$ *(Over-qualification capped)*
-- **Docker**: Missing $\rightarrow \text{Contribution} = 1 \times 0.0 = 0.0$
+**Student Candidate: Aarav Sharma (ID: 1)**:
+- **Python**: Level = 4, Verified = `True` $\rightarrow \text{Ratio} = \min(4/3, 1.0) = 1.0 \rightarrow \text{Contribution} = 5 \times 1.0 = 5.0$ *(Over-qualification capped)*
+- **FastAPI**: Level = 4, Verified = `True` $\rightarrow \text{Ratio} = \min(4/3, 1.0) = 1.0 \rightarrow \text{Contribution} = 4 \times 1.0 = 4.0$ *(Over-qualification capped)*
+- **PyTorch**: Missing $\rightarrow \text{Contribution} = 3 \times 0.0 = 0.0$
 
-**Calculations**:
-- **Weighted Sum** = $1.5 + 2.0 + 0.0 = 3.5$
-- **Base Score** = $(3.5 / 6) \times 100 = 58.33\%$
-- **Verified Bonus** = Student has 2 matched skills (Python, FastAPI); 1 is verified $\rightarrow 5.0 \times (1 / 2) = +2.5\%$
-- **Final Match Score** = $\text{round}(58.33 + 2.5, 1) = \mathbf{60.8\%}$
+**Step-by-Step Scoring**:
+- **Weighted Sum** = $5.0 + 4.0 + 0.0 = 9.0$
+- **Base Score** = $(9.0 / 12) \times 100 = 75.0\%$
+- **Verified Bonus** = Aarav has 2 matched skills (Python, FastAPI); both are verified ($2 / 2$) $\rightarrow 5.0 \times (2 / 2) = +5.0\%$
+- **Final Match Score** = $\min(100.0, \text{round}(75.0 + 5.0, 1)) = \mathbf{80.0\%}$
+
+*(Second candidate for comparison: **Priya Patel (ID: 2)** has Python 5 [Verified], PyTorch 4 [Verified], and lacks FastAPI. Her weighted sum is $5.0 \times 1.0 + 4.0 \times 0.0 + 3.0 \times 1.0 = 8.0 \rightarrow \text{Base Score} = (8.0/12) \times 100 = 66.67\% + 5.0\% \text{ bonus} = \mathbf{71.7\%}$.)*
 
 ---
 
@@ -274,14 +276,15 @@ $$\text{Final Score} = \min(100.0, \text{round}(\text{Base Score} + \text{Verifi
 
 ---
 
-## Screenshots Placeholder
+## Screenshots
 
-*Place evaluation demo screenshots below:*
+*Application interface screenshots captured from live runs:*
 
-1. **Executive Dashboard**: `![Dashboard](/screenshots/dashboard.png)`
-2. **Student Directory & Multi-Criteria Search**: `![Students](/screenshots/students.png)`
-3. **Smart Natural Language Search with Interpreted Badges**: `![AI Search](/screenshots/ai_search.png)`
-4. **Project Matcher with Ranked Candidate Score Breakdown**: `![Project Matcher](/screenshots/project_matcher.png)`
+1. **Executive Dashboard**: ![Dashboard](docs/screenshots/dashboard.png)
+2. **Student Directory & Multi-Criteria Search**: ![Students](docs/screenshots/students.png)
+3. **Projects Overview & Pipeline Drawer**: ![Projects](docs/screenshots/projects.png)
+4. **Project Matcher & Candidate Ranking**: ![Matches](docs/screenshots/matches.png)
+5. **Student Profile & Skill Gauges**: ![Profile](docs/screenshots/profile.png)
 
 ---
 

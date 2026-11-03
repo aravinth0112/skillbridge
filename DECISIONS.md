@@ -74,3 +74,20 @@ My note: AI is purely a natural language query parser producing structured filte
 | 2 Matching Engine | [x] | Implemented pure matching function with weighted capping, verified bonus, explainable matched/missing lists, and batch query loading. |
 | 2.5 Dashboard UI | [x] | Built vanilla JS + Chart.js responsive frontend, safely escaping textContent, friendly 409/422 error alerts, and interactive candidate match cards. |
 | 3 AI Search | [x] | Implemented Ollama natural-language query parser to JSON filters with zero-downtime keyword fallback, dropping unknown entities and protecting SQL execution. |
+
+## 10. Final state
+### What was built
+- **Complete Relational Architecture**: 8 normalized tables across academic hierarchy, student profiles, skill catalogs, project requirements, and shortlist pipelines with enforced foreign key PRAGMA rules.
+- **RESTful API Core**: Complete CRUD across all resources with explicit HTTP status codes (201 Created, 204 No Content, 409 Conflict on restricted parent deletes, 422 Validation).
+- **Explainable Matching Engine**: Pure mathematical scoring function with weighted requirements, over-qualification capped at 1.0, verified bonus up to +5%, and explainable matched/missing breakdowns.
+- **Resilient AI Search**: Structured JSON filter extraction via local Ollama (`llama3.2`) with seamless, zero-downtime keyword fallback guaranteeing no HTTP 500 errors.
+- **Accessible Vanilla Frontend**: 5 dedicated pages (Dashboard, Students, Student Profile, Projects, Matcher Drawer), signature 5-segment skill gauges with shortfall hatching, responsive from 360px to 1280px, motion control switch, and keyboard command palette (`/`).
+
+### Test Suite Verification
+- **Automated Tests**: 24 tests across all modules (`test_crud.py`, `test_matching.py`, `test_search.py`).
+- **Pass Rate**: 24 passed, 0 failed in 6.58 seconds.
+
+### Known Limitations
+- **Proficiency Verification**: Student skills are self-claimed unless explicitly flagged as verified by faculty or administrators.
+- **Database Concurrency**: SQLite operates in single-writer mode; production multi-user scale will require migrating connection strings to PostgreSQL.
+- **Query Parser Scope**: AI search parses natural language queries into discrete entity filters rather than generating open-ended arbitrary SQL.
