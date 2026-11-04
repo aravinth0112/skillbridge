@@ -66,10 +66,19 @@ app.include_router(dashboard_router)
 app.include_router(matching_router)
 app.include_router(ai_router)
 
-# Mount static frontend for Phase 2.5
-app.mount("/app", StaticFiles(directory="app/static", html=True), name="static")
-
+import os
 from fastapi.responses import RedirectResponse
+
+# Mount static frontend with absolute path
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+app.mount("/app", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+
+@app.get("/app", include_in_schema=False)
+@app.get("/api/index.py", include_in_schema=False)
+@app.get("/api/index", include_in_schema=False)
+@app.get("/api", include_in_schema=False)
+def app_entry_redirect(request: Request):
+    return RedirectResponse(url="/app/index.html")
 
 @app.get("/", tags=["Health"])
 def root_status(request: Request):
