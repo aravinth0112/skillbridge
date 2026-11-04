@@ -6,8 +6,13 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 # Load configuration from .env file if present
 load_dotenv()
 
-# SQLite database file path stored in project root (or from DATABASE_URL)
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./skillbridge.db")
+# SQLite database file path stored in project root (or /tmp on Vercel)
+if os.getenv("VERCEL"):
+    default_db_url = "sqlite:////tmp/skillbridge.db"
+else:
+    default_db_url = "sqlite:///./skillbridge.db"
+
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", default_db_url)
 
 # connect_args={"check_same_thread": False} is required for SQLite with multi-threaded FastAPI
 engine = create_engine(
