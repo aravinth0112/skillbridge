@@ -34,3 +34,5 @@ edge_temp/
 # IDE files
 .vscode/
 .idea/
+
+.vercel
