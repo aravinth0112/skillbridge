@@ -8,6 +8,8 @@ class TotalsCount(BaseModel):
     skills: int
     projects: int
     shortlists: int
+    open_projects: int = 0
+    verified_skills_pct: float = 0.0
 
 class DepartmentCount(BaseModel):
     department_id: int

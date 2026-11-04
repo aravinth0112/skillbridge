@@ -2,7 +2,7 @@
  * SkillBridge Project Detail & Matcher Controller
  * UI Round A Enhancements:
  * - Deadline formatted with relative chip ("15 Dec 2026", "in 12 days", coral under 14 days, "overdue" if past)
- * - Replace confirm() with inline confirmations ("Delete project? Delete / Keep", "Remove Python? Delete / Keep")
+ * - Inline confirmations ("Delete project? Delete / Keep", "Remove Python? Delete / Keep")
  * - Zero browser validation bubbles
  * - Skeleton rows on load
  * - Sentence-case labels throughout
@@ -137,7 +137,7 @@ function renderRequirementsLedger(reqSkills) {
     tdWeight.textContent = `Weight ${rs.weight}/5`;
     tr.appendChild(tdWeight);
 
-    // Action with Inline Confirmation (zero confirm() popup)
+    // Action with inline confirmation
     const tdAct = document.createElement("td");
     tdAct.style.textAlign = "right";
 
@@ -152,7 +152,7 @@ function renderRequirementsLedger(reqSkills) {
     removeBtn.textContent = "Remove";
     removeBtn.onclick = () => {
       removeBtn.style.display = "none";
-      showInlineConfirm(
+      showInlinePrompt(
         actContainer,
         `Remove ${rs.skill_name || "skill"}?`,
         async () => {
@@ -396,7 +396,7 @@ async function shortlistCandidate(candidateStudentId, matchScore, studentName) {
 
 function handleAutoShortlist() {
   const container = document.getElementById("project-notice-area");
-  showInlineConfirm(
+  showInlinePrompt(
     container,
     "Auto-shortlist the top 5 matching candidates (min score 50%)?",
     async () => {
@@ -549,7 +549,7 @@ function renderPipelineColumn(containerId, list, stageName) {
     removeBtn.textContent = "Remove from shortlist";
     removeBtn.onclick = () => {
       removeBtn.style.display = "none";
-      showInlineConfirm(
+      showInlinePrompt(
         actions,
         `Remove ${item.student_name || "student"}?`,
         async () => {
@@ -728,13 +728,13 @@ async function handleSaveProject(event) {
   }
 }
 
-// Inline Confirmation for Delete Project (Replacing confirm())
+// Inline confirmation for delete project
 function triggerDeleteProjectInline() {
   const container = document.getElementById("delete-proj-inline-area");
   const triggerBtn = document.getElementById("btn-delete-proj-trigger");
   triggerBtn.style.display = "none";
 
-  showInlineConfirm(
+  showInlinePrompt(
     container,
     `Delete ${currentProject ? currentProject.title : "this project"}?`,
     async () => {

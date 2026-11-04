@@ -1,16 +1,7 @@
 /**
  * SkillBridge Dashboard Controller
- * Modern SaaS Dashboard & Multi-Column Learning/Career Hub
+ * Modern Clean SaaS Dashboard & Academic Matcher
  */
-
-let placeholderCycleInterval = null;
-const exampleQueries = [
-  "Python and PyTorch available",
-  "Frontend UI and UX design",
-  "3rd year Robotics",
-  "Data Science and SQL students",
-  "Embedded systems in Electrical Eng"
-];
 
 async function initDashboard() {
   const railContainer = document.getElementById("rail-container");
@@ -23,209 +14,331 @@ async function initDashboard() {
     headerContainer.innerHTML = renderTopHeader();
   }
 
-  // Clear validation on input typing
-  const askInput = document.getElementById("ask-input");
-  if (askInput) {
-    askInput.addEventListener("input", () => {
-      const errBox = document.getElementById("ask-input-error");
-      if (errBox) errBox.style.display = "none";
-      askInput.classList.remove("has-error");
-    });
+  // Expose global query handlers for top search bar and prompt chips
+  window.runAskQuery = runAskQuery;
+  window.clearAskResults = clearAskResults;
 
-    startPlaceholderCycling(askInput);
-  }
+  await loadDashboardStats();
 
-  await Promise.all([
-    loadDashboardStats(),
-    loadRecommendedCourses(),
-    loadRecommendedProjects()
-  ]);
-
-  // If redirected with ?ask= query from Command Palette
+  // If redirected with ?ask= query from URL
   const urlParams = new URLSearchParams(window.location.search);
   const askQuery = urlParams.get("ask");
-  if (askQuery && askInput) {
-    askInput.value = askQuery;
-    handleAskSkillBridge(new Event("submit"));
+  if (askQuery) {
+    const topAsk = document.getElementById("top-ask-input");
+    if (topAsk) topAsk.value = askQuery;
+    runAskQuery(askQuery);
   }
 }
 
 /**
- * Cycles the Ask placeholder through realistic faculty queries
+ * Loads real platform statistics from /api/v1/dashboard/stats
  */
-function startPlaceholderCycling(inputEl) {
-  let queryIdx = 0;
-  let charIdx = 0;
-  let isDeleting = false;
-  let currentText = "";
-
-  function typeTick() {
-    if (document.documentElement.classList.contains("motion-off")) {
-      inputEl.placeholder = `Ask anything: for example, ${exampleQueries[0]}`;
-      return;
-    }
-
-    if (document.activeElement === inputEl || inputEl.value.length > 0) {
-      setTimeout(typeTick, 1000);
-      return;
-    }
-
-    const fullQuery = exampleQueries[queryIdx];
-
-    if (!isDeleting) {
-      charIdx++;
-      currentText = fullQuery.substring(0, charIdx);
-      inputEl.placeholder = `Ask anything: for example, ${currentText}`;
-
-      if (charIdx === fullQuery.length) {
-        isDeleting = true;
-        setTimeout(typeTick, 2000);
-        return;
-      }
-    } else {
-      charIdx--;
-      currentText = fullQuery.substring(0, charIdx);
-      inputEl.placeholder = `Ask anything: for example, ${currentText}`;
-
-      if (charIdx === 0) {
-        isDeleting = false;
-        queryIdx = (queryIdx + 1) % exampleQueries.length;
-        setTimeout(typeTick, 400);
-        return;
-      }
-    }
-
-    const speed = isDeleting ? 30 : 60;
-    setTimeout(typeTick, speed);
-  }
-
-  typeTick();
-}
-
 async function loadDashboardStats() {
   try {
     const stats = await apiRequest("/dashboard/stats");
 
-    // 1. Key Stat Metrics
-    animateCountUp("total-courses", stats.totals.courses, 350);
-    animateCountUp("total-skills", stats.totals.skills, 400);
-    animateCountUp("total-projects", stats.totals.projects, 350);
-    animateCountUp("total-shortlists", stats.totals.shortlists, 350);
-    animateCountUp("total-students", stats.totals.students, 450);
-    animateCountUp("total-departments", stats.totals.departments, 350);
+    // 1. Dashboard Stat Cards (Real API values)
+    animateCountUp("stat-students", stats.totals.students, 400);
+    animateCountUp("stat-open-projects", stats.totals.open_projects || 0, 350);
+    animateCountUp("stat-skills", stats.totals.skills, 400);
+    animateCountUp("stat-shortlists", stats.totals.shortlists, 350);
+    
+    const verifiedPctEl = document.getElementById("stat-verified-pct");
+    if (verifiedPctEl) {
+      verifiedPctEl.textContent = `${stats.totals.verified_skills_pct || 0}%`;
+    }
+
+    // Hidden backward compatibility elements
+    const setSafe = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+    setSafe("total-students", stats.totals.students);
+    setSafe("total-projects", stats.totals.projects);
+    setSafe("total-skills", stats.totals.skills);
+    setSafe("total-courses", stats.totals.courses);
+    setSafe("total-shortlists", stats.totals.shortlists);
+    setSafe("total-departments", stats.totals.departments);
 
     // 2. Supply vs Demand Benchmark
     renderSupplyDemandChart(stats.top_skills || []);
 
-    // 3. Ranked Department Distribution
+    // 3. Thin Bench Panel (Skills open projects need with 3 or fewer students)
+    renderThinBench(stats.top_skills || []);
+
+    // 4. Ranked Department Distribution
     renderRankedDepartments(stats.students_per_department || [], stats.totals.students);
+
+    // 5. Recent Shortlists & Open Projects
+    await Promise.all([
+      loadRecentShortlists(),
+      loadOpenProjects()
+    ]);
 
   } catch (err) {
     console.error("Failed to load dashboard stats:", err);
   }
 }
 
-async function loadRecommendedCourses() {
-  const container = document.getElementById("recommended-courses-list");
+/**
+ * Loads the latest 5 shortlists from /shortlists/
+ */
+async function loadRecentShortlists() {
+  const container = document.getElementById("recent-shortlists-list");
   if (!container) return;
 
   try {
-    const courses = await apiRequest("/courses/");
+    const shortlists = await apiRequest("/shortlists/?limit=5");
     container.innerHTML = "";
 
-    if (!courses || courses.length === 0) {
-      container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No degree programs registered yet.</div>';
+    if (!shortlists || shortlists.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.88rem;">
+          No one shortlisted yet. Open a project and click Find matches.
+        </div>
+      `;
       return;
     }
 
-    courses.slice(0, 4).forEach(c => {
-      const card = document.createElement("div");
-      card.style.background = "var(--bg-surface)";
-      card.style.border = "1px solid var(--border)";
-      card.style.borderRadius = "var(--radius-md)";
-      card.style.padding = "1rem";
-      card.style.display = "flex";
-      card.style.flexDirection = "column";
-      card.style.justifyContent = "space-between";
-      card.style.gap = "0.75rem";
-      card.style.transition = "transform var(--t-fast)";
+    shortlists.slice(0, 5).forEach(sl => {
+      const item = document.createElement("div");
+      item.style.display = "flex";
+      item.style.justifyContent = "space-between";
+      item.style.alignItems = "center";
+      item.style.padding = "0.75rem 1rem";
+      item.style.background = "var(--bg-surface)";
+      item.style.border = "1px solid var(--border)";
+      item.style.borderRadius = "var(--radius-md)";
+      item.style.gap = "0.75rem";
+      item.style.flexWrap = "wrap";
 
-      card.onmouseenter = () => card.style.transform = "translateY(-2px)";
-      card.onmouseleave = () => card.style.transform = "translateY(0)";
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.flexDirection = "column";
+      left.style.gap = "0.2rem";
 
-      card.innerHTML = `
-        <div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-            <span class="badge badge-open" style="font-size: 0.72rem;">${c.code}</span>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">Degree</span>
-          </div>
-          <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">${c.name}</div>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 0.5rem;">
-          <span style="font-size: 0.78rem; color: var(--text-secondary);">4-Year Curriculum</span>
-          <a href="/app/students.html" style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-decoration: none;">View Cohort →</a>
-        </div>
-      `;
+      const topRow = document.createElement("div");
+      topRow.style.display = "flex";
+      topRow.style.alignItems = "center";
+      topRow.style.gap = "0.5rem";
 
-      container.appendChild(card);
+      const sLink = document.createElement("a");
+      sLink.href = `/app/student.html?id=${sl.student_id}`;
+      sLink.style.fontWeight = "700";
+      sLink.style.fontSize = "0.9rem";
+      sLink.style.color = "var(--text-primary)";
+      sLink.style.textDecoration = "none";
+      sLink.textContent = sl.student_name || `Student #${sl.student_id}`;
+      topRow.appendChild(sLink);
+
+      const statusBadge = document.createElement("span");
+      statusBadge.className = `status-pill status-${sl.status}`;
+      statusBadge.style.fontSize = "0.72rem";
+      const statusLabels = {
+        shortlisted: "Shortlisted",
+        contacted: "Contacted",
+        selected: "Selected"
+      };
+      statusBadge.textContent = statusLabels[sl.status] || sl.status;
+      topRow.appendChild(statusBadge);
+
+      left.appendChild(topRow);
+
+      const pRow = document.createElement("div");
+      pRow.style.fontSize = "0.8rem";
+      pRow.style.color = "var(--text-muted)";
+      const pLink = document.createElement("a");
+      pLink.href = `/app/project.html?id=${sl.project_id}`;
+      pLink.style.color = "var(--text-secondary)";
+      pLink.style.textDecoration = "none";
+      pLink.textContent = sl.project_title || `Project #${sl.project_id}`;
+      pRow.appendChild(document.createTextNode("for "));
+      pRow.appendChild(pLink);
+      left.appendChild(pRow);
+
+      item.appendChild(left);
+
+      const right = document.createElement("div");
+      right.style.display = "flex";
+      right.style.alignItems = "center";
+      right.style.gap = "0.75rem";
+
+      if (sl.match_score !== null && sl.match_score !== undefined) {
+        const score = document.createElement("span");
+        score.style.fontWeight = "700";
+        score.style.fontSize = "0.9rem";
+        score.style.color = "var(--primary)";
+        score.textContent = `${Math.round(sl.match_score)}%`;
+        right.appendChild(score);
+      }
+
+      if (sl.created_at) {
+        const dateSpan = document.createElement("span");
+        dateSpan.style.fontSize = "0.75rem";
+        dateSpan.style.color = "var(--text-muted)";
+        const dateObj = new Date(sl.created_at);
+        dateSpan.textContent = dateObj.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        right.appendChild(dateSpan);
+      }
+
+      item.appendChild(right);
+      container.appendChild(item);
     });
 
   } catch (err) {
-    console.error("Failed to load recommended courses:", err);
+    console.error("Failed to load recent shortlists:", err);
   }
 }
 
-async function loadRecommendedProjects() {
-  const container = document.getElementById("recommended-projects-list");
+/**
+ * Loads the top 3 open projects from /projects/?status=open
+ */
+async function loadOpenProjects() {
+  const container = document.getElementById("open-projects-list");
   if (!container) return;
 
   try {
-    const projects = await apiRequest("/projects/");
+    const projects = await apiRequest("/projects/?status=open");
     container.innerHTML = "";
 
     if (!projects || projects.length === 0) {
-      container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No active projects available.</div>';
+      container.innerHTML = `
+        <div style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; text-align: center;">
+          No open projects available.
+        </div>
+      `;
       return;
     }
 
     projects.slice(0, 3).forEach(p => {
-      const card = document.createElement("div");
-      card.style.background = "var(--bg-surface)";
-      card.style.border = "1px solid var(--border)";
-      card.style.borderRadius = "var(--radius-md)";
-      card.style.padding = "0.85rem 1rem";
-      card.style.display = "flex";
-      card.style.justifyContent = "space-between";
-      card.style.alignItems = "center";
-      card.style.gap = "0.75rem";
-      card.style.transition = "transform var(--t-fast)";
+      const item = document.createElement("div");
+      item.style.display = "flex";
+      item.style.justifyContent = "space-between";
+      item.style.alignItems = "center";
+      item.style.padding = "0.75rem 0.85rem";
+      item.style.background = "var(--bg-surface)";
+      item.style.border = "1px solid var(--border)";
+      item.style.borderRadius = "var(--radius-md)";
+      item.style.gap = "0.75rem";
 
-      card.onmouseenter = () => card.style.transform = "translateY(-2px)";
-      card.onmouseleave = () => card.style.transform = "translateY(0)";
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.flexDirection = "column";
+      left.style.gap = "0.2rem";
+      left.style.minWidth = "0";
 
-      const deadlineInfo = formatDateWithChip(p.deadline);
+      const pTitle = document.createElement("a");
+      pTitle.href = `/app/project.html?id=${p.id}`;
+      pTitle.style.fontWeight = "700";
+      pTitle.style.fontSize = "0.88rem";
+      pTitle.style.color = "var(--text-primary)";
+      pTitle.style.textDecoration = "none";
+      pTitle.style.whiteSpace = "nowrap";
+      pTitle.style.overflow = "hidden";
+      pTitle.style.textOverflow = "ellipsis";
+      pTitle.textContent = p.title;
+      left.appendChild(pTitle);
 
-      card.innerHTML = `
-        <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-            <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.title}</div>
-            <span class="badge badge-open" style="font-size: 0.7rem; text-transform: capitalize;">${p.status.replace('_', ' ')}</span>
-          </div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">${deadlineInfo.formatted} (${deadlineInfo.chipText})</div>
-        </div>
-        <a href="/app/project.html?id=${p.id}" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; white-space: nowrap;">
-          Match
-        </a>
-      `;
+      const dInfo = formatDateWithChip(p.deadline);
+      const meta = document.createElement("span");
+      meta.style.fontSize = "0.75rem";
+      meta.style.color = "var(--text-muted)";
+      meta.textContent = `${dInfo.formatted} · ${dInfo.chipText}`;
+      left.appendChild(meta);
 
-      container.appendChild(card);
+      item.appendChild(left);
+
+      const matchLink = document.createElement("a");
+      matchLink.href = `/app/project.html?id=${p.id}`;
+      matchLink.className = "btn btn-secondary btn-sm";
+      matchLink.style.fontSize = "0.75rem";
+      matchLink.style.whiteSpace = "nowrap";
+      matchLink.textContent = "Find matches";
+      item.appendChild(matchLink);
+
+      container.appendChild(item);
     });
 
   } catch (err) {
-    console.error("Failed to load recommended projects:", err);
+    console.error("Failed to load open projects:", err);
   }
 }
 
+/**
+ * Renders the Thin Bench card: skills with project demand > 0 and student supply <= 3
+ */
+function renderThinBench(skills) {
+  const container = document.getElementById("thin-bench-container");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const thinSkills = (skills || []).filter(s => s.project_count > 0 && s.student_count <= 3);
+
+  if (thinSkills.length === 0) {
+    container.innerHTML = `
+      <div style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; text-align: center;">
+        No thin bench skills detected; all requested competencies have sufficient student supply.
+      </div>
+    `;
+    return;
+  }
+
+  thinSkills.forEach(s => {
+    const item = document.createElement("div");
+    item.style.display = "flex";
+    item.style.alignItems = "center";
+    item.style.justifyContent = "space-between";
+    item.style.padding = "0.65rem 0.85rem";
+    item.style.background = "var(--bg-surface)";
+    item.style.border = "1px solid var(--border)";
+    item.style.borderRadius = "var(--radius-md)";
+    item.style.gap = "0.75rem";
+
+    const left = document.createElement("div");
+    left.style.display = "flex";
+    left.style.flexDirection = "column";
+    left.style.gap = "0.15rem";
+
+    const titleRow = document.createElement("div");
+    titleRow.style.display = "flex";
+    titleRow.style.alignItems = "center";
+    titleRow.style.gap = "0.4rem";
+
+    const name = document.createElement("strong");
+    name.style.fontSize = "0.88rem";
+    name.style.color = "var(--text-primary)";
+    name.textContent = s.skill_name;
+    titleRow.appendChild(name);
+
+    const tag = document.createElement("span");
+    tag.className = "thin-bench-tag";
+    tag.textContent = "Thin bench";
+    titleRow.appendChild(tag);
+    left.appendChild(titleRow);
+
+    const desc = document.createElement("div");
+    desc.style.fontSize = "0.78rem";
+    desc.style.color = "var(--text-secondary)";
+    desc.textContent = `Needed by ${s.project_count} project${s.project_count === 1 ? '' : 's'} · only ${s.student_count} student${s.student_count === 1 ? '' : 's'} offer this`;
+    left.appendChild(desc);
+
+    item.appendChild(left);
+
+    const action = document.createElement("a");
+    action.href = `/app/students.html?skills=${encodeURIComponent(s.skill_name)}`;
+    action.className = "btn btn-secondary btn-sm";
+    action.style.fontSize = "0.75rem";
+    action.style.whiteSpace = "nowrap";
+    action.textContent = "View roster";
+    item.appendChild(action);
+
+    container.appendChild(item);
+  });
+}
+
+/**
+ * Renders Supply vs Demand Chart
+ */
 function renderSupplyDemandChart(skills) {
   const container = document.getElementById("sd-rows-container");
   if (!container) return;
@@ -341,6 +454,9 @@ function renderSupplyDemandChart(skills) {
   });
 }
 
+/**
+ * Renders Students by Department Breakdown
+ */
 function renderRankedDepartments(depts, totalStudents) {
   const container = document.getElementById("dept-ranked-container");
   if (!container) return;
@@ -400,42 +516,30 @@ function renderRankedDepartments(depts, totalStudents) {
   });
 }
 
+/**
+ * Click handler for example queries
+ */
 function applySampleQuery(queryText) {
-  const input = document.getElementById("ask-input");
-  input.value = queryText;
-  const errBox = document.getElementById("ask-input-error");
-  if (errBox) errBox.style.display = "none";
-  input.classList.remove("has-error");
-  handleAskSkillBridge(new Event("submit"));
+  const topAsk = document.getElementById("top-ask-input");
+  if (topAsk) {
+    topAsk.value = queryText;
+  }
+  runAskQuery(queryText);
 }
 
-async function handleAskSkillBridge(event) {
-  if (event && event.preventDefault) event.preventDefault();
-
-  const input = document.getElementById("ask-input");
-  const query = input.value.trim();
-  const errBox = document.getElementById("ask-input-error");
-
-  if (!query) {
-    input.classList.add("has-error");
-    errBox.textContent = "Enter a question, for example: Python and SQL students";
-    errBox.style.display = "block";
-    input.focus();
-    return;
-  }
-
-  errBox.style.display = "none";
-  input.classList.remove("has-error");
-
-  const submitBtn = document.getElementById("btn-ask-submit");
+/**
+ * Executes Ask search and renders results in the inline card
+ */
+async function runAskQuery(query) {
   const resultsContainer = document.getElementById("ask-results-container");
   const filtersArea = document.getElementById("ask-interpreted-filters");
   const resultsList = document.getElementById("ask-results-list");
   const seeAllArea = document.getElementById("ask-see-all-container");
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Searching...";
+  if (!resultsContainer || !resultsList) return;
+
   resultsContainer.style.display = "block";
+  resultsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
   filtersArea.textContent = "Interpreting query...";
   resultsList.innerHTML = renderSkeletonRows(2);
   seeAllArea.innerHTML = "";
@@ -564,10 +668,12 @@ async function handleAskSkillBridge(event) {
 
   } catch (err) {
     resultsList.innerHTML = `<div style="padding: 1rem; color: var(--status-urgent);">${err.message || "Failed to execute smart search."}</div>`;
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Ask";
   }
+}
+
+function clearAskResults() {
+  const container = document.getElementById("ask-results-container");
+  if (container) container.style.display = "none";
 }
 
 document.addEventListener("DOMContentLoaded", initDashboard);

@@ -31,6 +31,11 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
     total_skills = db.query(Skill).count()
     total_projects = db.query(Project).count()
     total_shortlists = db.query(Shortlist).count()
+    open_projects = db.query(Project).filter(func.lower(Project.status) == "open").count()
+
+    total_student_skills = db.query(StudentSkill).count()
+    verified_student_skills = db.query(StudentSkill).filter(StudentSkill.verified == True).count()
+    verified_skills_pct = round((verified_student_skills / total_student_skills * 100), 1) if total_student_skills > 0 else 0.0
 
     totals = TotalsCount(
         students=total_students,
@@ -38,7 +43,9 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
         courses=total_courses,
         skills=total_skills,
         projects=total_projects,
-        shortlists=total_shortlists
+        shortlists=total_shortlists,
+        open_projects=open_projects,
+        verified_skills_pct=verified_skills_pct
     )
 
     # 2. Students per department
@@ -87,6 +94,6 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
     return DashboardStatsResponse(
         totals=totals,
         students_per_department=students_per_dept,
-        top_skills=top_skills_list[:10], # Top 10 skills
+        top_skills=top_skills_list,
         proficiency_distribution=prof_dist
     )

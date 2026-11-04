@@ -1,7 +1,7 @@
 /**
  * SkillBridge Student Profile Controller
  * UI Round A Enhancements:
- * - Replace confirm() with inline confirmations ("Delete student? Delete / Keep", "Remove Python? Delete / Keep")
+ * - Inline confirmations ("Delete student? Delete / Keep", "Remove Python? Delete / Keep")
  * - Zero browser validation bubbles
  * - Skeleton rows on load
  * - Interactive 5-segment level meters with arrow keys and inline undo
@@ -180,7 +180,7 @@ function renderSkillsLedger(skills) {
     center.appendChild(noticeArea);
     card.appendChild(center);
 
-    // Right: Verification toggle and Inline Delete Confirmation (zero confirm() popup)
+    // Right: Verification toggle and inline delete confirmation
     const right = document.createElement("div");
     right.style.display = "flex";
     right.style.alignItems = "center";
@@ -205,7 +205,7 @@ function renderSkillsLedger(skills) {
     delBtn.textContent = "Remove";
     delBtn.onclick = () => {
       delBtn.style.display = "none";
-      showInlineConfirm(
+      showInlinePrompt(
         delContainer,
         `Remove ${ss.skill_name || "skill"}?`,
         async () => {
@@ -354,7 +354,7 @@ function triggerDeleteStudentInline() {
   const triggerBtn = document.getElementById("btn-delete-student-trigger");
   triggerBtn.style.display = "none";
 
-  showInlineConfirm(
+  showInlinePrompt(
     container,
     `Delete ${currentStudent ? currentStudent.full_name : "this student"}?`,
     async () => {

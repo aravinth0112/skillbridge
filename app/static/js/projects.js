@@ -199,6 +199,7 @@ async function loadProjects(highlightProjectId = null) {
       const matchBtn = document.createElement("a");
       matchBtn.href = `/app/project.html?id=${p.id}`;
       matchBtn.className = "btn btn-secondary btn-sm";
+      matchBtn.style.whiteSpace = "nowrap";
       matchBtn.textContent = "Find matches";
       tdAction.appendChild(matchBtn);
       tr.appendChild(tdAction);

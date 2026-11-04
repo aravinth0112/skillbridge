@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkillBridge – Smart Student Skill Finder & Project Matcher</title>
+  <title>SkillBridge – Who fits your next project?</title>
   <link rel="stylesheet" href="/app/css/style.css">
   <link rel="icon" type="image/svg+xml" href="/app/favicon.svg">
   <script src="/app/js/vendor/chart.umd.js"></script>
@@ -21,85 +21,44 @@
 
       <!-- Main Dashboard Workspace -->
       <main class="main-content">
-        <!-- 1. Welcome Message with User's Name -->
-        <section class="welcome-banner" aria-label="Welcome Overview">
+        <!-- 1. Page Title & Purpose -->
+        <section class="welcome-banner" aria-label="Overview banner">
           <div>
-            <h1 class="welcome-title">Welcome back, Aarav Sharma! 👋</h1>
-            <p class="welcome-subtitle">Here is your academic skill discovery, project shortlists, and learning progress overview.</p>
+            <h1 class="welcome-title">Who fits your next project?</h1>
+            <p class="welcome-subtitle">Search students by skill, then match them to a project.</p>
           </div>
           <div class="welcome-actions">
-            <a href="/app/projects.html" class="btn btn-secondary">Explore Projects</a>
-            <button type="button" class="btn btn-primary" onclick="openCommandPalette()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <span>Quick Search</span>
-            </button>
+            <a href="/app/projects.html" class="btn btn-secondary">Projects that need people</a>
+            <a href="/app/students.html" class="btn btn-primary">Find students</a>
           </div>
         </section>
 
-        <!-- 2. Key Metric Stat Cards (Enrolled Courses, Skills Acquired, Learning Progress, Projects, Career Readiness) -->
-        <section class="metrics-grid" aria-label="Platform Statistics">
-          <!-- Total Enrolled Courses -->
+        <!-- 2. Dashboard Stat Cards (Students, Open Projects, Skills, Shortlists, Verified Skills %) -->
+        <section class="metrics-grid" aria-label="Platform statistics">
+          <!-- Students -->
           <div class="stat-card">
             <div class="stat-card-header">
-              <span class="stat-card-label">Enrolled Programs</span>
+              <span class="stat-card-label">Students</span>
               <div class="stat-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
             </div>
-            <div id="total-courses" class="stat-card-value">5</div>
+            <div id="stat-students" class="stat-card-value">--</div>
             <div class="stat-card-meta">
-              <span class="stat-badge-positive">Active</span>
-              <span>Across 4 departments</span>
+              <span class="stat-badge-positive">Talent pool</span>
+              <span>In academic roster</span>
             </div>
           </div>
 
-          <!-- Skills Acquired -->
+          <!-- Open Projects -->
           <div class="stat-card">
             <div class="stat-card-header">
-              <span class="stat-card-label">Skills Acquired</span>
-              <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                </svg>
-              </div>
-            </div>
-            <div id="total-skills" class="stat-card-value">22</div>
-            <div class="stat-card-meta">
-              <span class="stat-badge-positive">+12 Verified</span>
-              <span>In active catalog</span>
-            </div>
-          </div>
-
-          <!-- Learning Progress -->
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <span class="stat-card-label">Learning Progress</span>
-              <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="18" y1="20" x2="18" y2="10"></line>
-                  <line x1="12" y1="20" x2="12" y2="4"></line>
-                  <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-              </div>
-            </div>
-            <div class="stat-card-value">74%</div>
-            <div class="stat-card-meta">
-              <div style="width: 100%; height: 6px; background: var(--bg-surface); border-radius: 4px; overflow: hidden;">
-                <div style="width: 74%; height: 100%; background: var(--emerald-gradient); border-radius: 4px;"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Projects -->
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <span class="stat-card-label">Completed Projects</span>
+              <span class="stat-card-label">Open projects</span>
               <div class="stat-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
@@ -108,66 +67,84 @@
                 </svg>
               </div>
             </div>
-            <div id="total-projects" class="stat-card-value">4</div>
+            <div id="stat-open-projects" class="stat-card-value">--</div>
             <div class="stat-card-meta">
-              <span class="stat-badge-positive" id="total-shortlists">4 Shortlists</span>
-              <span>Active pipeline</span>
+              <span class="stat-badge-positive">Active calls</span>
+              <span>Seeking candidates</span>
             </div>
           </div>
 
-          <!-- Career Readiness Score -->
+          <!-- Skills in Catalog -->
           <div class="stat-card">
             <div class="stat-card-header">
-              <span class="stat-card-label">Career Readiness</span>
-              <div class="stat-icon" style="background: var(--emerald-light); color: var(--primary);">
+              <span class="stat-card-label">Skills in catalog</span>
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </div>
+            </div>
+            <div id="stat-skills" class="stat-card-value">--</div>
+            <div class="stat-card-meta">
+              <span class="stat-badge-positive">Standardized</span>
+              <span>Across departments</span>
+            </div>
+          </div>
+
+          <!-- Shortlisted Candidates -->
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-label">Shortlisted candidates</span>
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+              </div>
+            </div>
+            <div id="stat-shortlists" class="stat-card-value">--</div>
+            <div class="stat-card-meta">
+              <span class="stat-badge-positive">Pipelines</span>
+              <span>Candidates in review</span>
+            </div>
+          </div>
+
+          <!-- Verified Skills Percentage -->
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-label">Verified skills</span>
+              <div class="stat-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value" style="color: var(--primary);">88%</div>
+            <div id="stat-verified-pct" class="stat-card-value">--</div>
             <div class="stat-card-meta">
-              <span class="stat-badge-positive">High Fit</span>
-              <span>Based on required skills</span>
+              <span class="stat-badge-positive">Faculty verified</span>
+              <span>Of student skill links</span>
             </div>
           </div>
         </section>
 
-        <!-- Hidden Compatibility Element for Totals -->
-        <span id="total-students" style="display: none;">34</span>
-        <span id="total-departments" style="display: none;">4</span>
+        <!-- Hidden Compatibility Elements for Backward Compatibility -->
+        <span id="total-students" style="display: none;"></span>
+        <span id="total-departments" style="display: none;"></span>
+        <span id="total-projects" style="display: none;"></span>
+        <span id="total-skills" style="display: none;"></span>
+        <span id="total-courses" style="display: none;"></span>
+        <span id="total-shortlists" style="display: none;"></span>
 
         <!-- 3. Multi-Column Arrangement (Center Feed + Right Insights Panel) -->
         <div class="dashboard-grid">
-          <!-- === CENTER COLUMN: Main Dashboard & Learning Activities === -->
+          <!-- === CENTER COLUMN: Ask Results, Skill Supply vs Demand, Recent Shortlists === -->
           <div class="dashboard-center">
             
-            <!-- Hero "Ask SkillBridge" Smart Search Bar -->
-            <section class="hero-ask-container" aria-label="Smart search assistant">
-              <div style="margin-bottom: 0.75rem;">
-                <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem;">AI Skill & Candidate Search</h2>
-                <p style="font-size: 0.85rem; color: var(--text-secondary);">Query student proficiencies and availability using plain natural language.</p>
-              </div>
-
-              <form id="ask-form" onsubmit="handleAskSkillBridge(event)" class="hero-ask-form" novalidate>
-                <div style="flex: 1; position: relative;">
-                  <input
-                    type="text"
-                    id="ask-input"
-                    class="hero-ask-input"
-                    placeholder="Ask anything: for example, 3rd year students with Python and Docker"
-                  >
-                </div>
-                <button type="submit" id="btn-ask-submit" class="btn btn-primary">
-                  Ask
-                </button>
-              </form>
-
-              <div id="ask-input-error" class="field-error" style="display: none;"></div>
-
-              <!-- Clickable Example Queries -->
-              <div class="prompt-chips">
+            <!-- Suggested Example Queries -->
+            <div class="prompt-chips-banner" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; background: var(--bg-surface); padding: 0.85rem 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Suggested queries:</span>
                 <button type="button" class="prompt-chip" onclick="applySampleQuery('Python and PyTorch available')">
                   Python and PyTorch available
                 </button>
@@ -178,30 +155,37 @@
                   3rd year Robotics
                 </button>
               </div>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">Use the search bar above or press <span class="kbd-shortcut">/</span></span>
+            </div>
 
-              <!-- Inline Results Container -->
-              <div id="ask-results-container" style="display: none; margin-top: 1.25rem; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
-                <div id="ask-interpreted-filters" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.85rem;"></div>
-                <div id="ask-results-list" style="display: flex; flex-direction: column; gap: 0.65rem;"></div>
-                <div id="ask-see-all-container" style="margin-top: 1rem; text-align: right;"></div>
+            <!-- Inline Ask Results Container -->
+            <div id="ask-results-container" style="display: none; margin-bottom: 1.5rem;" class="card">
+              <div class="panel-header" style="margin-bottom: 0.75rem;">
+                <div>
+                  <h2 class="panel-title" style="font-size: 1.15rem;">Candidate search results</h2>
+                  <div id="ask-interpreted-filters" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;"></div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="clearAskResults()">Dismiss</button>
               </div>
-            </section>
+              <div id="ask-results-list" style="display: flex; flex-direction: column; gap: 0.65rem;"></div>
+              <div id="ask-see-all-container" style="margin-top: 1rem; text-align: right;"></div>
+            </div>
 
             <!-- Skill Supply vs Demand Chart Card -->
             <section class="card" aria-label="Skill supply and demand analytics">
               <div class="panel-header" style="margin-bottom: 0.5rem; padding-bottom: 0;">
                 <div>
-                  <h2 class="panel-title">Skill Supply & Demand Benchmark</h2>
-                  <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Technologies requested by open projects against candidate talent pool.</p>
+                  <h2 class="panel-title">Skill supply and demand benchmark</h2>
+                  <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Skills projects ask for, against students who have them.</p>
                 </div>
-                <span class="badge badge-open">Live Roster</span>
+                <span class="badge badge-open">Live roster</span>
               </div>
 
               <div class="supply-demand-table" style="margin-top: 1rem;">
                 <div class="sd-header-row">
-                  <span style="text-align: right;">Student Supply</span>
-                  <span style="text-align: center;">Skill Category</span>
-                  <span style="text-align: left;">Project Demand</span>
+                  <span style="text-align: right;">Student supply</span>
+                  <span style="text-align: center;">Skill category</span>
+                  <span style="text-align: left;">Project demand</span>
                 </div>
                 <div id="sd-rows-container">
                   <div class="skeleton-row"><div class="skeleton-bar" style="width: 30%;"></div><div class="skeleton-bar" style="width: 20%;"></div><div class="skeleton-bar" style="width: 25%;"></div></div>
@@ -210,183 +194,61 @@
               </div>
             </section>
 
-            <!-- Recommended Courses Grid (from /api/v1/courses/) -->
-            <section id="learning" class="card" aria-label="Recommended Degree Programs">
-              <div class="panel-header">
+            <!-- Recent Shortlists Card -->
+            <section class="card" aria-label="Recent shortlists" style="margin-top: 1.5rem;">
+              <div class="panel-header" style="margin-bottom: 0.75rem;">
                 <div>
-                  <h2 class="panel-title">Recommended Degree Programs</h2>
-                  <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Academic programs offered across engineering and science faculties.</p>
+                  <h2 class="panel-title">Recent shortlists</h2>
+                  <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Latest candidate evaluations across active project pipelines.</p>
                 </div>
-                <a href="/app/students.html" class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;">Browse Cohorts</a>
+                <a href="/app/projects.html" class="btn btn-secondary btn-sm" style="font-size: 0.8rem;">Projects</a>
               </div>
-
-              <div id="recommended-courses-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-top: 0.75rem;">
-                <!-- Dynamically loaded -->
-                <div class="skeleton-row"><div class="skeleton-bar" style="width: 100%; height: 60px;"></div></div>
-              </div>
-            </section>
-
-            <!-- Recent Activities Timeline -->
-            <section class="card" aria-label="Recent Activities">
-              <div class="panel-header">
-                <h2 class="panel-title">Recent Learning & Shortlist Activities</h2>
-                <span style="font-size: 0.8rem; color: var(--text-muted);">Real-time events</span>
-              </div>
-
-              <div id="activity-timeline" style="display: flex; flex-direction: column; gap: 0.85rem; margin-top: 0.5rem;">
-                <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
-                  <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--primary); margin-top: 5px; flex-shrink: 0;"></div>
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Aarav Sharma shortlisted for Campus AI Assistant</div>
-                    <div style="font-size: 0.78rem; color: var(--text-secondary);">Match score computed at 80.0% with verified Python and FastAPI skills.</div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Today, 04:30 PM</div>
-                  </div>
-                </div>
-                <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
-                  <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--status-progress); margin-top: 5px; flex-shrink: 0;"></div>
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">Sneha Rao advanced to Selected stage</div>
-                    <div style="font-size: 0.78rem; color: var(--text-secondary);">Autonomous Warehouse Rover finalized selection with 95.0% score.</div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Yesterday, 11:20 AM</div>
-                  </div>
-                </div>
-                <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
-                  <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--emerald-dark); margin-top: 5px; flex-shrink: 0;"></div>
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary);">12 Student Skills Officially Verified</div>
-                    <div style="font-size: 0.78rem; color: var(--text-secondary);">Faculty completed verification for Python, Docker, ROS, and PostgreSQL.</div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">3 days ago</div>
-                  </div>
-                </div>
+              <div id="recent-shortlists-list" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                <div class="skeleton-row"><div class="skeleton-bar" style="width: 100%; height: 45px;"></div></div>
               </div>
             </section>
 
           </div>
 
-          <!-- === RIGHT COLUMN: AI Recommendations, Progress & Notifications === -->
+          <!-- === RIGHT COLUMN: Thin Bench, Department Breakdown, Open Projects === -->
           <div class="dashboard-right">
 
-            <!-- Skill Readiness Gauge Card -->
-            <section id="assessment" class="card" aria-label="Skill Readiness Assessment">
-              <div class="panel-header">
-                <h2 class="panel-title">Skill Assessment</h2>
-                <span class="badge badge-open">Level 4/5</span>
-              </div>
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Core competencies evaluated against current university project requirements.</p>
-
-              <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <!-- Thin Bench Card (Skills projects need but <=3 students have) -->
+            <section class="card" aria-label="Thin bench skills">
+              <div class="panel-header" style="margin-bottom: 0.5rem;">
                 <div>
-                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
-                    <strong>Python</strong>
-                    <span style="color: var(--primary); font-weight: 600;">Advanced (4/5)</span>
-                  </div>
-                  <div class="gauge-meter">
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment"></div>
-                  </div>
+                  <h2 class="panel-title">Thin bench</h2>
+                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">Skills open projects need with 3 or fewer available students.</p>
                 </div>
-
-                <div>
-                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
-                    <strong>FastAPI</strong>
-                    <span style="color: var(--primary); font-weight: 600;">Advanced (4/5)</span>
-                  </div>
-                  <div class="gauge-meter">
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment"></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
-                    <strong>Docker</strong>
-                    <span style="color: var(--text-muted); font-weight: 600;">Basic (2/5)</span>
-                  </div>
-                  <div class="gauge-meter">
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment active-segment"></div>
-                    <div class="gauge-segment"></div>
-                    <div class="gauge-segment"></div>
-                    <div class="gauge-segment"></div>
-                  </div>
-                </div>
+                <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: var(--status-urgent);">Low supply</span>
               </div>
 
-              <div style="margin-top: 1.25rem; text-align: center;">
-                <a href="/app/student.html?id=1" class="btn btn-secondary" style="width: 100%; font-size: 0.82rem;">Update Profile Skills</a>
-              </div>
-            </section>
-
-            <!-- AI Career Assistant Card -->
-            <section class="card" style="border-left: 4px solid var(--primary);" aria-label="AI Recommendations">
-              <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.5rem;">
-                <div style="width: 28px; height: 28px; border-radius: var(--radius-md); background: var(--emerald-gradient); display: flex; align-items: center; justify-content: center; color: #fff;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                </div>
-                <h2 class="panel-title" style="margin: 0;">AI Career Insights</h2>
-              </div>
-              <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Based on open project postings, adding <strong>Docker (Level 3)</strong> and <strong>PyTorch (Level 2)</strong> will elevate your project matching score from <strong>80.0% to 94.5%</strong>.</p>
-              
-              <div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-surface); border-radius: var(--radius-md); font-size: 0.8rem;">
-                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.2rem;">Next Milestone:</div>
-                <div style="color: var(--text-secondary);">Complete Docker Containerization module to qualify for Cloud Telemetry Gateway.</div>
-              </div>
-            </section>
-
-            <!-- Recommended Job Opportunities / Projects -->
-            <section id="opportunities" class="card" aria-label="Recommended Project Opportunities">
-              <div class="panel-header">
-                <h2 class="panel-title">Project Opportunities</h2>
-                <a href="/app/projects.html" style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">View all</a>
-              </div>
-
-              <div id="recommended-projects-list" style="display: flex; flex-direction: column; gap: 0.85rem;">
-                <!-- Dynamically loaded -->
-                <div class="skeleton-row"><div class="skeleton-bar" style="width: 100%; height: 50px;"></div></div>
-              </div>
-            </section>
-
-            <!-- Upcoming Learning Tasks -->
-            <section id="roadmap" class="card" aria-label="Upcoming Learning Tasks">
-              <div class="panel-header">
-                <h2 class="panel-title">Upcoming Tasks</h2>
-                <span class="badge badge-open">3 Pending</span>
-              </div>
-
-              <div style="display: flex; flex-direction: column; gap: 0.65rem;">
-                <div style="padding: 0.65rem; background: var(--bg-surface); border-radius: var(--radius-md); font-size: 0.85rem;">
-                  <div style="font-weight: 600; color: var(--text-primary);">PyTorch Model Evaluation</div>
-                  <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
-                    <span>Campus AI Project</span>
-                    <span style="color: var(--status-urgent); font-weight: 600;">Due in 3 days</span>
-                  </div>
-                </div>
-
-                <div style="padding: 0.65rem; background: var(--bg-surface); border-radius: var(--radius-md); font-size: 0.85rem;">
-                  <div style="font-weight: 600; color: var(--text-primary);">Submit Skill Verification Request</div>
-                  <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
-                    <span>Faculty CSE Portal</span>
-                    <span>Due in 10 days</span>
-                  </div>
-                </div>
+              <div id="thin-bench-container" style="display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.75rem;">
+                <div class="skeleton-row"><div class="skeleton-bar" style="width: 100%; height: 40px;"></div></div>
               </div>
             </section>
 
             <!-- Department Talent Breakdown -->
             <section class="card" aria-label="Students by department">
               <div class="panel-header">
-                <h2 class="panel-title">Students by Department</h2>
+                <h2 class="panel-title">Students by department</h2>
               </div>
               <div id="dept-ranked-container" class="dept-ranked-list">
                 <div class="skeleton-row"><div class="skeleton-bar" style="width: 60%;"></div><div class="skeleton-bar" style="width: 20%;"></div></div>
+              </div>
+            </section>
+
+            <!-- Open Projects Card (Top 3) -->
+            <section class="card" aria-label="Open projects" style="margin-top: 1.5rem;">
+              <div class="panel-header" style="margin-bottom: 0.75rem;">
+                <div>
+                  <h2 class="panel-title">Open projects</h2>
+                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">Projects currently seeking candidate matches.</p>
+                </div>
+                <a href="/app/projects.html" style="font-size: 0.8rem; color: var(--primary); font-weight: 600; text-decoration: none;">View all</a>
+              </div>
+              <div id="open-projects-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="skeleton-row"><div class="skeleton-bar" style="width: 100%; height: 50px;"></div></div>
               </div>
             </section>
 

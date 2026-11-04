@@ -204,7 +204,7 @@ function renderSkeletonRows(count = 3) {
 /**
  * Inline confirmation box replacing window.confirm
  */
-function showInlineConfirm(containerOrId, promptText, onConfirm, onKeep) {
+function showInlinePrompt(containerOrId, promptText, onProceed, onKeep) {
   const container = typeof containerOrId === "string" ? document.getElementById(containerOrId) : containerOrId;
   if (!container) return;
 
@@ -236,7 +236,7 @@ function showInlineConfirm(containerOrId, promptText, onConfirm, onKeep) {
   delBtn.textContent = "Delete";
   delBtn.onclick = () => {
     box.remove();
-    if (onConfirm) onConfirm();
+    if (onProceed) onProceed();
   };
   box.appendChild(delBtn);
 
@@ -536,31 +536,14 @@ function renderRailNav(activeKey = "dashboard") {
           </a>
         </li>
         <li>
-          <a href="/app/index.html#learning" class="rail-link ${activeKey === 'learning' ? 'active' : ''}">
+          <a href="/app/students.html" class="rail-link ${activeKey === 'students' ? 'active' : ''}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>My Learning</span>
-          </a>
-        </li>
-        <li>
-          <a href="/app/index.html#assessment" class="rail-link ${activeKey === 'assessment' ? 'active' : ''}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="m9 12 2 2 4-4"></path>
-            </svg>
-            <span>Skill Assessment</span>
-          </a>
-        </li>
-        <li>
-          <a href="/app/index.html#roadmap" class="rail-link ${activeKey === 'roadmap' ? 'active' : ''}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-              <line x1="8" y1="2" x2="8" y2="18"></line>
-              <line x1="16" y1="6" x2="16" y2="22"></line>
-            </svg>
-            <span>Skill Roadmap</span>
+            <span>Talent Roster</span>
           </a>
         </li>
         <li>
@@ -571,79 +554,30 @@ function renderRailNav(activeKey = "dashboard") {
               <polyline points="2 12 12 17 22 12"></polyline>
             </svg>
             <span>Projects</span>
-            <span class="rail-badge">4</span>
           </a>
         </li>
         <li>
-          <a href="/app/students.html" class="rail-link ${activeKey === 'students' ? 'active' : ''}">
+          <a href="/docs" target="_blank" class="rail-link">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
-            <span>Talent Roster</span>
-            <span class="rail-badge">34</span>
-          </a>
-        </li>
-        <li>
-          <a href="/app/projects.html#opportunities" class="rail-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-            </svg>
-            <span>Job Opportunities</span>
-          </a>
-        </li>
-        <li>
-          <a href="/app/students.html?ai=true" class="rail-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
-            </svg>
-            <span>AI Career Assistant</span>
-          </a>
-        </li>
-      </ul>
-
-      <div class="rail-section-label" style="margin-top: 0.5rem;">Account & Extras</div>
-      <ul class="rail-menu">
-        <li>
-          <a href="#certificates" class="rail-link" onclick="alert('Certificates module: Verified 22 student skills across catalog.')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <circle cx="12" cy="8" r="7"></circle>
-              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-            </svg>
-            <span>Certificates</span>
-          </a>
-        </li>
-        <li>
-          <a href="#community" class="rail-link" onclick="alert('Campus Community: 4 active engineering departments.')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h24s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            <span>Community</span>
-          </a>
-        </li>
-        <li>
-          <a href="#settings" class="rail-link" onclick="openCommandPalette()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-            <span>Settings</span>
+            <span>API Docs</span>
           </a>
         </li>
       </ul>
 
       <div class="rail-footer">
-        <a href="/app/student.html?id=1" class="rail-user-profile" title="View Aarav Sharma's Profile">
-          <div class="rail-avatar">AS</div>
+        <div class="rail-user-profile" style="cursor: default;">
+          <div class="rail-avatar">AD</div>
           <div class="rail-user-info">
-            <span class="rail-user-name">Aarav Sharma</span>
-            <span class="rail-user-role">Student · CSE Y3</span>
+            <span class="rail-user-name">Admin</span>
+            <span class="rail-user-role">Workspace Manager</span>
           </div>
-        </a>
+        </div>
 
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.25rem 0.5rem;">
           <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;" onclick="openCommandPalette()">
@@ -670,22 +604,48 @@ function renderRailNav(activeKey = "dashboard") {
 }
 
 /**
- * Renders Top Navigation Bar with Search, Notification Dropdown, Theme Toggle, Profile
+ * Handles Top Bar Ask Search
+ */
+function handleTopAskSearch(event) {
+  if (event && event.preventDefault) event.preventDefault();
+  const input = document.getElementById("top-ask-input");
+  if (!input) return;
+  const query = input.value.trim();
+  if (!query) return;
+
+  if (typeof window.runAskQuery === "function") {
+    window.runAskQuery(query);
+  } else {
+    window.location.href = `/app/index.html?ask=${encodeURIComponent(query)}`;
+  }
+}
+
+/**
+ * Renders Top Navigation Bar with Single Ask Search, Theme Toggle, Admin Profile
  */
 function renderTopHeader() {
   const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
 
   return `
     <header class="top-navbar" aria-label="Header Navigation">
-      <div class="top-nav-left">
-        <div class="global-search-bar" onclick="openCommandPalette()" style="cursor: pointer;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: var(--text-muted);">
+      <div class="top-nav-left" style="flex: 1; max-width: 580px;">
+        <form class="top-nav-search-form" onsubmit="handleTopAskSearch(event)" style="display: flex; align-items: center; width: 100%; position: relative;" novalidate>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: var(--text-muted); position: absolute; left: 1rem; pointer-events: none;">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" placeholder="Search students, skills, projects, or ask questions..." readonly>
-          <span class="kbd-shortcut">/</span>
-        </div>
+          <input
+            type="text"
+            id="top-ask-input"
+            class="global-search-input"
+            placeholder="Ask SkillBridge: e.g. Python and SQL students, or / for palette..."
+            autocomplete="off"
+            style="width: 100%; padding: 0.55rem 4.8rem 0.55rem 2.6rem; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: var(--transition-fast);"
+          >
+          <button type="submit" class="btn btn-primary top-ask-btn" style="position: absolute; right: 4px; padding: 0.35rem 0.85rem; font-size: 0.78rem; border-radius: var(--radius-pill); height: calc(100% - 8px); display: inline-flex; align-items: center; justify-content: center;">
+            Ask
+          </button>
+        </form>
       </div>
 
       <div class="top-nav-right">
@@ -712,126 +672,15 @@ function renderTopHeader() {
           `}
         </button>
 
-        <!-- Notification Bell -->
-        <div style="position: relative;">
-          <button type="button" class="nav-icon-btn" onclick="toggleDropdown('notifications-dropdown')" aria-label="View notifications">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h24s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            <span class="badge-dot"></span>
-          </button>
-
-          <!-- Notification Dropdown -->
-          <div id="notifications-dropdown" class="dropdown-panel">
-            <div class="dropdown-header">
-              <span class="dropdown-title">Notifications</span>
-              <span class="badge badge-open">3 new</span>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 280px; overflow-y: auto;">
-              <div class="dropdown-item">
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-top: 6px; flex-shrink: 0;"></div>
-                <div>
-                  <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">Python Skill Verified</div>
-                  <div style="font-size: 0.78rem; color: var(--text-secondary);">Faculty verified your Python proficiency at Level 4.</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">10 mins ago</div>
-                </div>
-              </div>
-              <div class="dropdown-item">
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-top: 6px; flex-shrink: 0;"></div>
-                <div>
-                  <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">Shortlisted for Campus AI</div>
-                  <div style="font-size: 0.78rem; color: var(--text-secondary);">Your profile ranked #1 with 80.0% match score.</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">2 hours ago</div>
-                </div>
-              </div>
-              <div class="dropdown-item">
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--border-hover); margin-top: 6px; flex-shrink: 0;"></div>
-                <div>
-                  <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">New Project Posted</div>
-                  <div style="font-size: 0.78rem; color: var(--text-secondary);">Autonomous Warehouse Rover is looking for ROS developers.</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">1 day ago</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Messages Button -->
-        <div style="position: relative;">
-          <button type="button" class="nav-icon-btn" onclick="toggleDropdown('messages-dropdown')" aria-label="View messages">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span class="badge-dot"></span>
-          </button>
-
-          <!-- Messages Dropdown -->
-          <div id="messages-dropdown" class="dropdown-panel">
-            <div class="dropdown-header">
-              <span class="dropdown-title">Direct Messages</span>
-              <span class="badge badge-open">2 unread</span>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-              <div class="dropdown-item">
-                <div class="rail-avatar" style="width: 30px; height: 30px; font-size: 0.75rem;">DR</div>
-                <div>
-                  <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">Dr. Raman (Faculty CSE)</div>
-                  <div style="font-size: 0.78rem; color: var(--text-secondary);">Can we schedule an interview for the AI assistant?</div>
-                </div>
-              </div>
-              <div class="dropdown-item">
-                <div class="rail-avatar" style="width: 30px; height: 30px; font-size: 0.75rem;">PC</div>
-                <div>
-                  <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">Placement Cell</div>
-                  <div style="font-size: 0.78rem; color: var(--text-secondary);">Please update your Docker and Cloud skills.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- User Profile Avatar & Dropdown -->
-        <div style="position: relative;">
-          <button type="button" onclick="toggleDropdown('profile-dropdown')" style="display: flex; align-items: center; gap: 0.5rem; background: none; border: none; cursor: pointer; padding: 2px;">
-            <div class="rail-avatar" style="width: 36px; height: 36px;">AS</div>
-          </button>
-
-          <div id="profile-dropdown" class="dropdown-panel" style="width: 200px;">
-            <div style="padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-subtle);">
-              <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">Aarav Sharma</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">aarav.s@campus.edu</div>
-            </div>
-            <a href="/app/student.html?id=1" class="dropdown-item" style="font-size: 0.85rem;">View Profile</a>
-            <a href="/app/students.html" class="dropdown-item" style="font-size: 0.85rem;">All Students</a>
-            <a href="/app/projects.html" class="dropdown-item" style="font-size: 0.85rem;">My Projects</a>
-            <div style="border-top: 1px solid var(--border-subtle); margin-top: 0.25rem; padding-top: 0.25rem;">
-              <a href="javascript:void(0)" onclick="alert('Session logged out.')" class="dropdown-item" style="color: var(--status-urgent); font-size: 0.85rem;">Log out</a>
-            </div>
-          </div>
+        <!-- Plain Admin Label -->
+        <div style="display: flex; align-items: center; gap: 0.45rem; padding: 0.35rem 0.75rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 600; color: var(--text-primary);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary);"></span>
+          <span>Admin</span>
         </div>
       </div>
     </header>
   `;
 }
-
-function toggleDropdown(panelId) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const isOpen = panel.classList.contains("open");
-  // Close any other open dropdowns
-  document.querySelectorAll(".dropdown-panel.open").forEach(p => p.classList.remove("open"));
-  if (!isOpen) {
-    panel.classList.add("open");
-  }
-}
-
-// Close dropdowns when clicking outside
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".top-nav-right")) {
-    document.querySelectorAll(".dropdown-panel.open").forEach(p => p.classList.remove("open"));
-  }
-});
 
 // =========================================================
 // COMMAND PALETTE IMPLEMENTATION ("/" or "Ctrl+K")

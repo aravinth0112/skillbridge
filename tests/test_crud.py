@@ -323,6 +323,10 @@ def test_dashboard_stats_endpoint(client):
     assert "top_skills" in data
     assert "proficiency_distribution" in data
     assert data["totals"]["students"] >= 1
+    assert "open_projects" in data["totals"]
+    assert "verified_skills_pct" in data["totals"]
+    assert isinstance(data["totals"]["open_projects"], int)
+    assert isinstance(data["totals"]["verified_skills_pct"], (int, float))
 
 def test_frontend_static_pages_served(client):
     res_index = client.get("/app/index.html")

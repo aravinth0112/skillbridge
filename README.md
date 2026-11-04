@@ -143,7 +143,7 @@ The seeder is idempotent and safe to run multiple times without duplicating entr
 ```powershell
 py -3.11 seed.py
 ```
-This populates 4 departments, 5 degree programs, 22 technical skills, 38 realistic student profiles with varied competencies, and 4 sample project listings.
+This populates 4 departments, 5 degree programs, 22 technical skills, 34 realistic student profiles with varied competencies, and 4 sample project listings.
 
 ### 5. Run the Application Server
 ```powershell
@@ -154,6 +154,11 @@ Once running, open your browser:
 - **Student Directory & AI Search**: [http://127.0.0.1:8000/app/students.html](http://127.0.0.1:8000/app/students.html)
 - **Projects & Matcher**: [http://127.0.0.1:8000/app/projects.html](http://127.0.0.1:8000/app/projects.html)
 - **Interactive Swagger API Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+### Live Demo
+- **Hosted Application**: [https://skillbridge-phi-eight.vercel.app](https://skillbridge-phi-eight.vercel.app)
+  > [!NOTE]
+  > The hosted cloud version may reset sample data periodically, and the full version with local AI search via Ollama runs locally.
 
 ---
 
